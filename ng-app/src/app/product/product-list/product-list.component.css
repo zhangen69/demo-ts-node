@@ -1,0 +1,16 @@
+.action-group {
+  padding: 10px 0;
+}
+
+.mat-column-select {
+  width: 50px;
+}
+
+.mat-column-action {
+  width: 150px;
+  text-align: center;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
