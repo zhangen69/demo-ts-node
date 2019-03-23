@@ -41,7 +41,6 @@ export default class StandardRoutes {
     private resHandling(res, func) {
         try {
             func.then((result) => {
-                // res.send('hello world!');
                 res.status(result.status).json(result);
             }).catch((result) => {
                 res.status(result.status).json(result);

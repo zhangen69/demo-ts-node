@@ -4,8 +4,7 @@
   "description": "demo typescript working with node express",
   "main": "app.js",
   "scripts": {
-    "start": "tsc --outDir ../dist && nodemon ../dist/app.js",
-    "tsc": "tsc --outDir ../dist",
+    "start": "tsc --outDir ../dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jacob Tan",

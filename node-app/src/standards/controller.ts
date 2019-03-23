@@ -1,6 +1,5 @@
 import Promise from 'promise';
 import MQueryModel from '../interfaces/mongoose/query.interface';
-import DataModel from '../models/product.model';
 import QueryModel from '../models/query.model';
 
 export default class StandardController {
@@ -132,6 +131,7 @@ export default class StandardController {
         if (model.hasOwnProperty('audit')) {
             Object.keys(model.audit).forEach((key) => updateModel.$set[`audit.${key}`] = model.audit[key]);
             delete updateModel.$set.audit;
+            delete updateModel.$set['audit.updatedDate'];
             updateModel.$currentDate = { 'audit.updatedDate': { $type: 'date' } };
         }
 

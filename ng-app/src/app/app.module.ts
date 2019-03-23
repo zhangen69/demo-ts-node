@@ -10,7 +10,8 @@ import { MatButtonModule,
   MatFormFieldModule,
   MatInputModule,
   MatCardModule,
-  MatSnackBarModule} from '@angular/material';
+  MatSnackBarModule,
+  MatDialogModule} from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,12 +20,14 @@ import { ProductListComponent } from './product/product-list/product-list.compon
 import { ProductFormComponent } from './product/product-form/product-form.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ConfirmationDialogComponent } from './templates/confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductListComponent,
-    ProductFormComponent
+    ProductFormComponent,
+    ConfirmationDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +47,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatInputModule,
     MatCardModule,
     MatSnackBarModule,
+    MatDialogModule,
   ],
+  entryComponents: [ConfirmationDialogComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

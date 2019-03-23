@@ -6,11 +6,11 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   { path: 'product/list', component: ProductListComponent },
   { path: 'product/add', component: ProductFormComponent },
-  { path: 'product/edit', component: ProductFormComponent },
+  { path: 'product/edit/:id', component: ProductFormComponent },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
