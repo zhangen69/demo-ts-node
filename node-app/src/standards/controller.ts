@@ -1,5 +1,5 @@
 import Promise from 'promise';
-import MQueryModel from '../interfaces/mongoose/query.interface';
+import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.interface';
 import QueryModel from '../models/query.model';
 
 export default class StandardController {
@@ -70,7 +70,8 @@ export default class StandardController {
                         message: `${this.modelName} fetched all successfully!`,
                         data,
                         totalItems: count,
-                        pages: Math.ceil(count / queryModel.pageSize),
+                        currentPage: queryModel.currentPage,
+                        totalPages: Math.ceil(count / queryModel.pageSize),
                     };
                     fulfill(result);
                 });
@@ -126,7 +127,7 @@ export default class StandardController {
     }
 
     private _getUpdateConditions(model) {
-        const updateModel: MQueryModel = { $set: model };
+        const updateModel: IMongooseQueryModel = { $set: model };
 
         if (model.hasOwnProperty('audit')) {
             Object.keys(model.audit).forEach((key) => updateModel.$set[`audit.${key}`] = model.audit[key]);

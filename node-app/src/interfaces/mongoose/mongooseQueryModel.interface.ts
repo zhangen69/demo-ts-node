@@ -1,4 +1,4 @@
-export default interface MongooseQueryModel {
+export default interface IMongooseQueryModel {
     $set?: any;
     $currentDate?: any;
     $lte?: any;

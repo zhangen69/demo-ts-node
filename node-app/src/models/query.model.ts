@@ -1,14 +1,15 @@
-import MQueryModel from '../interfaces/mongoose/query.interface';
+import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.interface';
+import IQueryModel from '../interfaces/queryModel.interface';
 
-export default class QueryModel {
-    public pageSize = 0;
-    public currentPage = 0;
-    public searchText = '';
-    public max = null;
-    public min = null;
-    public type = null;
-    public queryType = 'string';
-    public filters = [];
+export default class QueryModel implements IQueryModel {
+    pageSize = 0;
+    currentPage = 0;
+    searchText = '';
+    max = null;
+    min = null;
+    type = null;
+    queryType = 'string';
+    filters = [];
 
     constructor(queryModel: any = {}) {
         // for pagination
@@ -60,7 +61,7 @@ export default class QueryModel {
                 }
                 break;
             case 'number':
-                const query: MQueryModel = {};
+                const query: IMongooseQueryModel = {};
 
                 if (options.min != null) {
                     query.$gte = options.min;
