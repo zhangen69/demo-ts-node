@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Product } from '../../models/product.model';
-import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
+import { MatTableDataSource, MatSort, MatPaginator, PageEvent } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
@@ -37,6 +37,11 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
   selection = new SelectionModel<PeriodicElement>(true, []);
   resultsLength = 0;
+  queryModel = {
+    pageSize: 5,
+    currentPage: 0
+  };
+  pageEvent: PageEvent;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -63,7 +68,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.fetchAll().subscribe((res: any) => {
       this.products = new MatTableDataSource<Product>(res.data);
       this.products.sort = this.sort;
-      this.resultsLength = res.data.length;
+      this.resultsLength = res.totalItems;
     });
   }
 
@@ -73,6 +78,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     merge(this.sort.sortChange, this.paginator.page)
       .pipe(
         switchMap(() => {
+          this.queryModel.currentPage = this.pageEvent.pageIndex;
           return this.fetchAll();
         }),
         map((res: any) => {
@@ -86,12 +92,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   fetchAll() {
-    const queryModel = {
-      pageSize: 5,
-      currentPage: 0
-    };
-
-    return this.service.fetchAll(queryModel);
+    return this.service.fetchAll(this.queryModel);
   }
 
   delete(item) {
