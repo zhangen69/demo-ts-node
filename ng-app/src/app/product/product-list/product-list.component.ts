@@ -14,6 +14,7 @@ import { merge } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { ProductService } from 'src/app/services/product.service';
 
 export interface PeriodicElement {
   name: string;
@@ -64,12 +65,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       : this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
-  constructor(
-    private http: HttpClient,
-    private snackBar: MatSnackBar,
-    private router: Router,
-    private dialog: MatDialog
-  ) {}
+  constructor(private service: ProductService) {}
 
   ngOnInit() {
     this.fetchAll().subscribe((res: any) => {
@@ -103,29 +99,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       currentPage: 0
     };
 
-    return this.http.get(
-      environment.apiUrl +
-        '/service/product?queryModel=' +
-        JSON.stringify(queryModel)
-    );
+    return this.service.fetchAll(queryModel);
   }
 
   delete(item) {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: item
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.http
-          .delete(environment.apiUrl + '/service/product/' + result._id)
-          .subscribe((res: any) => {
-            this.snackBar.open(res.message, 'Dismiss', {
-              duration: 3000
-            });
-            window.location.reload();
-          });
-      }
-    });
+    this.service.delete(item);
   }
 }
