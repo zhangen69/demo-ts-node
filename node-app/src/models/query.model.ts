@@ -2,6 +2,8 @@ import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.inter
 import IQueryModel from '../interfaces/queryModel.interface';
 
 export default class QueryModel implements IQueryModel {
+    sort = 'audit.updatedDate';
+    sortDirection = 'DESC';
     pageSize = 0;
     currentPage = 0;
     searchText = '';
@@ -21,6 +23,9 @@ export default class QueryModel implements IQueryModel {
         this.min = queryModel.min || this.min;
         this.type = queryModel.type || this.type;
         this.queryType = queryModel.queryType || this.queryType;
+        // for sorting
+        this.sort = queryModel.sortBy || this.sort;
+        this.sortDirection = queryModel.sortDirection || this.sortDirection;
         // advanced search
         this.filters = queryModel.filters || this.filters;
     }
@@ -29,7 +34,7 @@ export default class QueryModel implements IQueryModel {
         // query patterns: conditions, select columns, pagination options
         const conditions = {};
         const selections = null;
-        const options = { skip: (this.currentPage * this.pageSize), limit: this.pageSize };
+        const options = { skip: (this.currentPage * this.pageSize), limit: this.pageSize, sort: {} };
 
         if (!!this.type && !!this.searchText) {
             this._getCondition(conditions, this);
@@ -42,6 +47,10 @@ export default class QueryModel implements IQueryModel {
                     this._getCondition(conditions, filter);
                 }
             });
+        }
+
+        if (this.sort) {
+            options.sort[this.sort] = this.sortDirection === 'ASC' ? 0 : -1;
         }
 
         return {conditions, selections, options};

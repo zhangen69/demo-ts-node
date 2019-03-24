@@ -7,4 +7,6 @@ export default interface IQueryModel {
     type?: string;
     queryType?: string;
     filters?: any[];
+    sort?: string;
+    sortDirection: string;
 }
