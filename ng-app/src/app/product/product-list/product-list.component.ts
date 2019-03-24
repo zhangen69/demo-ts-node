@@ -1,20 +1,10 @@
-import { ConfirmationDialogComponent } from './../../templates/confirmation-dialog/confirmation-dialog.component';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Product } from '../../models/product.model';
-import { HttpClient } from '@angular/common/http';
-import {
-  MatTableDataSource,
-  MatSort,
-  MatPaginator,
-  MatSnackBar,
-  MatDialog
-} from '@angular/material';
+import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
-import { ProductService } from 'src/app/services/product.service';
+import { StandardService } from 'src/app/services/standard.service';
 
 export interface PeriodicElement {
   name: string;
@@ -65,7 +55,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       : this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
-  constructor(private service: ProductService) {}
+  constructor(private service: StandardService) {
+    this.service.init('product');
+  }
 
   ngOnInit() {
     this.fetchAll().subscribe((res: any) => {
