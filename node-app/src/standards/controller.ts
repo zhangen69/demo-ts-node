@@ -63,17 +63,17 @@ export default class StandardController {
         return new Promise((fulfill, reject) => {
             const query = new QueryModel(queryModel).getQuery();
 
-            this.model.find(query.conditions, query.selections, query.options, (err, docs) => {
-                // console.log(err);
-                // console.log(docs);
-            }).then((data) => {
-                const result = {
-                    status: 200,
-                    message: `${this.modelName} fetched all successfully!`,
-                    data,
-                };
-                // console.log(data);
-                fulfill(result);
+            this.model.estimatedDocumentCount(query.conditions).then((count) => {
+                this.model.find(query.conditions, query.selections, query.options).then((data) => {
+                    const result = {
+                        status: 200,
+                        message: `${this.modelName} fetched all successfully!`,
+                        data,
+                        totalItems: count,
+                        pages: Math.ceil(count / queryModel.pageSize),
+                    };
+                    fulfill(result);
+                });
             });
         });
     }
