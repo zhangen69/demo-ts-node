@@ -2,8 +2,9 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar, Sort } from '@angular/material';
 import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/confirmation-dialog.component';
+import { IQueryModel } from '../interfaces/query-model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,14 @@ import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/co
 export class StandardService {
   domain: string;
   apiUrl: string;
+  queryModel: IQueryModel;
 
   constructor(private http: HttpClient, private dialog: MatDialog, private snackBar: MatSnackBar, private router: Router) {}
 
-  init(domain) {
+  init(domain, queryModel = null) {
     this.domain = domain;
     this.apiUrl = `${environment.apiUrl}/service/${this.domain}`;
+    this.queryModel = queryModel;
   }
 
   create(formData) {
@@ -44,7 +47,8 @@ export class StandardService {
     return fetchData;
   }
 
-  fetchAll(queryModel = {}) {
+  fetchAll(queryModel = {}, currentPage) {
+    this.queryModel.currentPage = currentPage;
     return this.http.get(this.apiUrl + '?queryModel=' + JSON.stringify(queryModel));
   }
 
@@ -59,5 +63,12 @@ export class StandardService {
         });
       }
     });
+  }
+
+  sort(sort: Sort, callback) {
+    this.queryModel.sort = sort.active;
+    this.queryModel.sortDirection = sort.direction.toUpperCase();
+
+    callback();
   }
 }

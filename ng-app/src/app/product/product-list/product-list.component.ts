@@ -34,10 +34,10 @@ const ELEMENT_DATA: PeriodicElement[] = [
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
   products: MatTableDataSource<Product>;
-  displayedColumns: string[] = ['name', 'price', 'action'];
+  displayedColumns: string[] = ['name', 'price', 'audit.updatedDate', 'action'];
   dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
   selection = new SelectionModel<PeriodicElement>(true, []);
-  resultsLength = 0;
+  totalItems = 0;
   queryModel: IQueryModel = {
     pageSize: 5,
     currentPage: 0,
@@ -61,7 +61,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   constructor(private service: StandardService) {
-    this.service.init('product');
+    this.service.init('product', this.queryModel);
   }
 
   ngOnInit() {
@@ -77,11 +77,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   fetchAll() {
-    this.queryModel.currentPage = this.paginator.pageIndex;
-    this.service.fetchAll(this.queryModel).subscribe((res: any) => {
+    this.service.fetchAll(this.queryModel, this.paginator.pageIndex).subscribe((res: any) => {
       this.products = new MatTableDataSource<Product>(res.data);
       this.products.sort = this.sort;
-      this.resultsLength = res.totalItems;
+      this.totalItems = res.totalItems;
     });
   }
 
@@ -90,9 +89,6 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   sortData(sort: Sort) {
-    console.log(sort);
-    this.queryModel.sort = sort.active;
-    this.queryModel.sortDirection = sort.direction;
-    this.fetchAll();
+    this.service.sort(sort, this.fetchAll);
   }
 }
