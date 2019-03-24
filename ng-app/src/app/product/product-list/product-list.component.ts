@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Product } from '../../models/product.model';
-import { MatTableDataSource, MatSort, MatPaginator, PageEvent } from '@angular/material';
+import { MatTableDataSource, MatSort, MatPaginator, PageEvent, Sort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { merge } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { StandardService } from 'src/app/services/standard.service';
+import { IQueryModel } from 'src/app/interfaces/query-model';
 
 export interface PeriodicElement {
   name: string;
@@ -37,11 +38,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
   selection = new SelectionModel<PeriodicElement>(true, []);
   resultsLength = 0;
-  queryModel = {
+  queryModel: IQueryModel = {
     pageSize: 5,
-    currentPage: 0
+    currentPage: 0,
   };
-  pageEvent: PageEvent;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -65,37 +65,34 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.fetchAll().subscribe((res: any) => {
+    this.fetchAll();
+  }
+
+  ngAfterViewInit() {
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+
+    merge(this.sort.sortChange, this.paginator.page).subscribe(() => {
+      this.fetchAll();
+    });
+  }
+
+  fetchAll() {
+    this.queryModel.currentPage = this.paginator.pageIndex;
+    this.service.fetchAll(this.queryModel).subscribe((res: any) => {
       this.products = new MatTableDataSource<Product>(res.data);
       this.products.sort = this.sort;
       this.resultsLength = res.totalItems;
     });
   }
 
-  ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-    merge(this.sort.sortChange, this.paginator.page)
-      .pipe(
-        switchMap(() => {
-          this.queryModel.currentPage = this.pageEvent.pageIndex;
-          return this.fetchAll();
-        }),
-        map((res: any) => {
-          return res.data;
-        })
-      )
-      .subscribe(
-        (data: Product[]) =>
-          (this.products = new MatTableDataSource<Product>(data))
-      );
-  }
-
-  fetchAll() {
-    return this.service.fetchAll(this.queryModel);
-  }
-
   delete(item) {
     this.service.delete(item);
+  }
+
+  sortData(sort: Sort) {
+    console.log(sort);
+    this.queryModel.sort = sort.active;
+    this.queryModel.sortDirection = sort.direction;
+    this.fetchAll();
   }
 }

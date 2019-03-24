@@ -6,7 +6,7 @@
   {{ product.name }}
 </p> -->
 
-<table mat-table [dataSource]="products" matSort class="mat-elevation-z8">
+<table mat-table [dataSource]="products" matSort class="mat-elevation-z8" (matSortChange)="sortData($event)">
   <!-- Name Column -->
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
@@ -32,6 +32,6 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
 </table>
 
-<mat-paginator [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]" (page)="pageEvent = $event"></mat-paginator>
+<mat-paginator [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
 
 
