@@ -2,10 +2,6 @@
   <a [routerLink]="['/product/add']" routerLinkActive="router-link-active" mat-raised-button>New Product</a>
 </div>
 
-<!-- <p *ngFor="let product of products">
-  {{ product.name }}
-</p> -->
-
 <table mat-table [dataSource]="products" matSort class="mat-elevation-z8" (matSortChange)="sortData($event)">
   <!-- Name Column -->
   <ng-container matColumnDef="name">
