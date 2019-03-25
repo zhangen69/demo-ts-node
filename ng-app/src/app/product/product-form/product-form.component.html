@@ -4,7 +4,7 @@
     <mat-card-subtitle>Please fill-in all the required fields marked with asterisks (*).</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <form #form="ngForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <form #form="ngForm" id="form" (ngSubmit)="onSubmit()">
       <mat-form-field>
         <input matInput #name="ngModel" [(ngModel)]="formData.name" name="name" placeholder="Name" required />
       </mat-form-field>
@@ -25,7 +25,7 @@
     </form>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-raised-button [routerLink]="['/product/list']"><mat-icon>arrow_back_ios</mat-icon> Cancel</button>
-    <button mat-raised-button color="primary"><mat-icon>done</mat-icon> Submit</button>
+    <button mat-raised-button [routerLink]="['/product/list']" type="button"><mat-icon>arrow_back_ios</mat-icon> Cancel</button>
+    <button mat-raised-button color="primary" type="submit" form="form"><mat-icon>done</mat-icon> Submit</button>
   </mat-card-actions>
 </mat-card>
