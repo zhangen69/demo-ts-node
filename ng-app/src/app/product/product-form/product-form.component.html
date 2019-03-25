@@ -13,6 +13,16 @@
         <input type="number" matInput #price="ngModel" [(ngModel)]="formData.price" name="price" placeholder="Price" required />
       </mat-form-field>
 
+      <div class="image-picker">
+        <!-- <button mat-stroked-button type="button" (click)="filePicker.click()">Pick Image</button> -->
+        <!-- <input type="file" class="input-file" #filePicker (change)="onImagePicked($event)"> -->
+        <input type="file" ng2FileSelect [uploader]="uploader" />
+      </div>
+
+      <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview">
+        <img [src]="imagePreview">
+      </div>
+
       <button mat-raised-button color="primary">Submit</button>
     </form>
   </mat-card-content>

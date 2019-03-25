@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import cloudinary from 'cloudinary';
 import express from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
@@ -6,6 +7,13 @@ import path from 'path';
 
 // import routes
 import productRoutes from './routes/product.routes';
+
+// configure cloudinary
+cloudinary.config({
+    cloud_name: 'dfupaaz9h',
+    api_key: '597377239584466',
+    api_secret: '6JeSp8D94uXUfMx9a-vH-KyiQ6I',
+});
 
 // initialize app
 const app = express();
@@ -28,6 +36,12 @@ app.use('/service', productRoutes);
 app.use('/', express.static(path.join(__dirname, 'ng-app')));
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'ng-app', 'index.html'));
+});
+
+// upload route
+app.post('/upload', (req, res) => {
+    console.log(req.body);
+    // cloudinary.uploader.upload()
 });
 
 // mongodb connection

@@ -12,6 +12,7 @@ import { MatButtonModule,
   MatCardModule,
   MatSnackBarModule,
   MatDialogModule} from '@angular/material';
+import { FileUploadModule } from 'ng2-file-upload';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -37,6 +38,7 @@ import { ConfirmationDialogComponent } from './templates/confirmation-dialog/con
     FormsModule,
     ReactiveFormsModule,
     FlexLayoutModule,
+    FileUploadModule,
     MatToolbarModule,
     MatButtonModule,
     MatTableModule,
