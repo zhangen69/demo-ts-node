@@ -4,22 +4,23 @@
 > It's a application with MEAN Stack that means MongoDB, ExpressJs, Angular, and NodeJs. In case, it just a demostration.
 
 # Used Frameworks/Library
-- MongoDB v1.17.0 (Open Source Document Database)
-- Angular v7.2.4 (TypeScript-based open-source web application framework)
-- Angular Material v7.3.3 (Material Design for Angular)
-- Angular Flex Layout v7.0.0-beta.23 (Sophisticated Layout API using Flexbox CSS + mediaQuery)
-- ExpressJs v4.16.4 (Fast, unopinionated, minimalist web framework for Node.js)
-- Mongoose v5.4.18 (elegant mongodb object modeling for node.js, ODM for MongoDB)
-- Nodemon v1.18.10 (Serve app and restart automatically, Perfect for development)
-- PromiseJs v8.0.2 (A website dedicated to promises in JavaScript)
-- BodyParser v1.18.3 (Node.js body parsing middleware)
+> dependencies
+- body-parser v1.18.3
+- cloudinary v1.13.2
+- express v4.16.4
+- mongoose v5.4.19
+- multer v1.4.1
+- multer-storage-cloudinary v2.2.1
+- promise v8.0.3
+> devDependencies
 - @types/express v4.16.1
 - @types/mongoose v5.3.23
+- @types/multer v1.3.7
+- nodemon v1.18.10
 - tslint v5.14.0
 - typescript v3.3.4000
 
 # Pending & Ready to Use
-- cloudinary
 - angular-jwt
 - jsreport
 - express-mailer
