@@ -54,12 +54,12 @@ app.use((req, res, next) => {
 app.use('/service', productRoutes);
 
 // upload image route
-app.post('/image/upload', upload, (req, res) => {
+app.post('/multer/upload', upload, (req, res) => {
     const url = req.protocol + '://' + req.get('host') + '/images/' + req.file.filename;
     res.status(200).json({ message: 'upload success', url });
 });
 
-app.post('/api/upload', uploader, (req, res) => {
+app.post('/cloudinary/upload', uploader, (req, res) => {
     if (req.file) {
         res.status(200).json({ messge: 'upload success', url: req.file.url });
     }

@@ -7,6 +7,7 @@ import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/co
 import { IQueryModel } from '../interfaces/query-model';
 import { switchMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { UploadType } from '../enums/upload-type.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -67,11 +68,17 @@ export class StandardService {
     });
   }
 
-  uploadImage(file: File) {
+  uploadImage(file: File, type: UploadType = UploadType.Multer) {
     const formData = new FormData();
     formData.append('image', file);
 
-    return this.http.post(environment.apiUrl + '/image/upload', formData).toPromise().then((res: any) => {
+    let uploadUrl = '/multer';
+
+    if (type === UploadType.Cloudinary) {
+      uploadUrl = '/cloudinary';
+    }
+
+    return this.http.post(environment.apiUrl + uploadUrl + '/upload', formData).toPromise().then((res: any) => {
       this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
       return res;
     });
