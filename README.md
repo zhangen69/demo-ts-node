@@ -29,8 +29,8 @@
 
 # Planning Features
 ### Angular App
-- [ ] Standard Services (Model-Based)
-- [ ] Upload Images (cloudinary/Google Photo API)
+- [x] Standard Services (Model-Based)
+- [x] Upload Images (cloudinary & multer)
 - [ ] Auth (JWT)
 - [ ] HTTP Interception (Header-Authorization)
 - [ ] Generate Rules
@@ -57,6 +57,9 @@
   - [ ] Email Queue (MongoDB)
   - [ ] Resend Email Service
 - [ ] Configuration Settings
+- [x] Upload Images
+  - [x] Multer Uploader
+  - [x] Cloudinary Uploader
 
 ### WebApp
 - [ ] User & Auth
@@ -69,8 +72,9 @@
   - [ ] Change Password
 - [ ] Product (or any other collection/module)
   - [x] Standard CRUD
-  - [ ] Upload Images
+  - [x] Upload Images
   - [x] Updated Audit for each Record (created by, created date, updated by, updated date)
+  - [ ] Search & Filter Records
 - [ ] Send Email
 - [ ] Generate Report
 - [ ] Configuration Settings (Email Settings, Access Failed Settings, ...)
