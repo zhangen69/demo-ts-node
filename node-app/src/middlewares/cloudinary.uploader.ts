@@ -18,6 +18,6 @@ const cloudStorage = cloudinaryStorage({
     },
 });
 
-const uploader = multer({ storage: cloudStorage }).single('image');
+const cloudinaryUploader = multer({ storage: cloudStorage }).single('image');
 
-export { uploader };
+export { cloudinaryUploader };
