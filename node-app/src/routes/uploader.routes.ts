@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'path';
 
 // import middlewares
 import { cloudinaryUploader } from '../middlewares/cloudinary.uploader';
