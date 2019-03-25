@@ -6,11 +6,24 @@
   width: 50px;
 }
 
-.mat-column-action {
+.mat-column-audit-updatedDate {
   width: 150px;
+}
+
+.mat-column-action {
+  width: 200px;
   text-align: center;
+}
+
+.mat-column-action button {
+  padding: 0 8px;
+  margin: 0 5px;
 }
 
 th.mat-sort-header-sorted {
   color: black;
+}
+
+.mat-paginator {
+  margin-top: 1rem;
 }

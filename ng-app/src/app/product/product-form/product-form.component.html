@@ -1,10 +1,10 @@
-<mat-card>
+<mat-card class="card-md">
   <mat-card-header>
     <mat-card-title>New Product</mat-card-title>
-    <mat-card-subtitle>subtitle</mat-card-subtitle>
+    <mat-card-subtitle>Please fill-in all the required fields marked with asterisks (*).</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <form #form="ngForm" (ngSubmit)="onSubmit()">
+    <form #form="ngForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
       <mat-form-field>
         <input matInput #name="ngModel" [(ngModel)]="formData.name" name="name" placeholder="Name" required />
       </mat-form-field>
@@ -14,19 +14,18 @@
       </mat-form-field>
 
       <div class="image-picker">
-        <!-- <button mat-stroked-button type="button" (click)="filePicker.click()">Pick Image</button> -->
-        <!-- <input type="file" class="input-file" #filePicker (change)="onImagePicked($event)"> -->
-        <input type="file" ng2FileSelect [uploader]="uploader" />
+        <button mat-stroked-button type="button" (click)="filePicker.click()"><mat-icon>photo</mat-icon> Pick Image</button>
+        <input type="file" class="input-file" #filePicker (change)="onImagePicked($event)">
       </div>
 
-      <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview">
-        <img [src]="imagePreview">
+      <div class="image-preview" *ngIf="(imagePreview !== '' && imagePreview) || formData.photoUrl">
+        <img [src]="imagePreview" *ngIf="imagePreview !== '' && imagePreview">
+        <img [src]="formData.photoUrl" *ngIf="formData.photoUrl && !imagePreview">
       </div>
-
-      <button mat-raised-button color="primary">Submit</button>
     </form>
   </mat-card-content>
-  <!-- <mat-card-actions>
-    <button mat-button>Ok</button>
-  </mat-card-actions> -->
+  <mat-card-actions>
+    <button mat-raised-button [routerLink]="['/product/list']"><mat-icon>arrow_back_ios</mat-icon> Cancel</button>
+    <button mat-raised-button color="primary"><mat-icon>done</mat-icon> Submit</button>
+  </mat-card-actions>
 </mat-card>

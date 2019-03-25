@@ -3,3 +3,19 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 table { width: 100%; }
+
+.mat-card[class*="card-"] {
+  margin: 0 auto;
+}
+
+.mat-card.card-sm {
+  max-width: 576px;
+}
+
+.mat-card.card-md {
+  max-width: 768px;
+}
+
+.mat-card.card-lg {
+  max-width: 992px;
+}

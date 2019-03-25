@@ -5,6 +5,8 @@ import { environment } from 'src/environments/environment';
 import { MatDialog, MatSnackBar, Sort } from '@angular/material';
 import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/confirmation-dialog.component';
 import { IQueryModel } from '../interfaces/query-model';
+import { switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -62,6 +64,16 @@ export class StandardService {
           window.location.reload();
         });
       }
+    });
+  }
+
+  uploadImage(file: File) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    return this.http.post(environment.apiUrl + '/image/upload', formData).toPromise().then((res: any) => {
+      this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+      return res;
     });
   }
 
