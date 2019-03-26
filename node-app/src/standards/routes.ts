@@ -1,3 +1,5 @@
+import { checkAuth } from '../middlewares/checkAuth';
+
 export default class StandardRoutes {
     private modelName: string;
     private modelService: any;
@@ -13,7 +15,7 @@ export default class StandardRoutes {
             throw new Error('"router" is not defined.');
         }
 
-        router.post(`/${this.modelName}`, (req, res) => {
+        router.post(`/${this.modelName}`, checkAuth, (req, res) => {
             this.resHandling(res, this.modelService.create(req.body));
         });
 
@@ -27,11 +29,11 @@ export default class StandardRoutes {
             this.resHandling(res, this.modelService.fetchAll(JSON.parse(queryModel)));
         });
 
-        router.put(`/${this.modelName}/`, (req, res) => {
+        router.put(`/${this.modelName}/`, checkAuth, (req, res) => {
             this.resHandling(res, this.modelService.update(req.body));
         });
 
-        router.delete(`/${this.modelName}/:id`, (req, res) => {
+        router.delete(`/${this.modelName}/:id`, checkAuth, (req, res) => {
             this.resHandling(res, this.modelService.delete(req.params.id));
         });
 

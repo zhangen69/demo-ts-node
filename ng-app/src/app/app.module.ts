@@ -1,7 +1,9 @@
+import { AuthInterceptor } from './auth/auth.interceptor';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MatButtonModule,
+import {
+  MatButtonModule,
   MatToolbarModule,
   MatTableModule,
   MatCheckboxModule,
@@ -12,7 +14,8 @@ import { MatButtonModule,
   MatCardModule,
   MatSnackBarModule,
   MatDialogModule,
-  MatIconModule} from '@angular/material';
+  MatIconModule
+} from '@angular/material';
 import { FileUploadModule } from 'ng2-file-upload';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -20,11 +23,12 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ProductListComponent } from './product/product-list/product-list.component';
 import { ProductFormComponent } from './product/product-form/product-form.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationDialogComponent } from './templates/confirmation-dialog/confirmation-dialog.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +37,8 @@ import { RegisterComponent } from './auth/register/register.component';
     ProductFormComponent,
     ConfirmationDialogComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
@@ -55,10 +60,12 @@ import { RegisterComponent } from './auth/register/register.component';
     MatCardModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatIconModule,
+    MatIconModule
   ],
   entryComponents: [ConfirmationDialogComponent],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

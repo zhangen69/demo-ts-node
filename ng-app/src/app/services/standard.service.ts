@@ -5,8 +5,6 @@ import { environment } from 'src/environments/environment';
 import { MatDialog, MatSnackBar, Sort } from '@angular/material';
 import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/confirmation-dialog.component';
 import { IQueryModel } from '../interfaces/query-model';
-import { switchMap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 import { UploadType } from '../enums/upload-type.enum';
 
 @Injectable({
@@ -17,7 +15,12 @@ export class StandardService {
   apiUrl: string;
   queryModel: IQueryModel;
 
-  constructor(private http: HttpClient, private dialog: MatDialog, private snackBar: MatSnackBar, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private router: Router
+  ) {}
 
   init(domain, queryModel = null) {
     this.domain = domain;
@@ -26,24 +29,38 @@ export class StandardService {
   }
 
   create(formData) {
-    this.http.post(this.apiUrl, formData).subscribe((data: any) => {
-      this.snackBar.open(data.message, 'Dismiss', { duration: 3000 });
-      this.router.navigate([`/${this.domain}/list`]);
-    });
+    this.http.post(this.apiUrl, formData).subscribe(
+      (data: any) => {
+        this.snackBar.open(data.message, 'Dismiss', { duration: 3000 });
+        this.router.navigate([`/${this.domain}/list`]);
+      },
+      (res: any) => {
+        this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
+      }
+    );
   }
 
   update(formData) {
-    this.http.put(this.apiUrl, formData).subscribe((data: any) => {
-      this.snackBar.open(data.message, 'Dismiss', { duration: 3000 });
-      this.router.navigate([`/${this.domain}/list`]);
-    });
+    this.http.put(this.apiUrl, formData).subscribe(
+      (res: any) => {
+        this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+        this.router.navigate([`/${this.domain}/list`]);
+      },
+      (res: any) => {
+        this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
+      }
+    );
   }
 
   fetch(id, formData = null) {
     const fetchData = this.http.get(this.apiUrl + '/' + id);
 
     if (formData !== null) {
-      fetchData.subscribe((res: any) => formData = res.data);
+      fetchData.subscribe(
+        (res: any) => (formData = res.data),
+        (res: any) =>
+          this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 })
+      );
       return;
     }
 
@@ -52,18 +69,29 @@ export class StandardService {
 
   fetchAll(queryModel = {}, currentPage) {
     this.queryModel.currentPage = currentPage;
-    return this.http.get(this.apiUrl + '?queryModel=' + JSON.stringify(queryModel));
+    return this.http.get(
+      this.apiUrl + '?queryModel=' + JSON.stringify(queryModel)
+    );
   }
 
   delete(item) {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, { data: item });
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: item
+    });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.http.delete(this.apiUrl + '/' + result._id).subscribe((res: any) => {
-          this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
-          window.location.reload();
-        });
+        this.http.delete(this.apiUrl + '/' + result._id).subscribe(
+          (res: any) => {
+            this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+            window.location.reload();
+          },
+          (res: any) => {
+            this.snackBar.open(res.error.message, 'Dismiss', {
+              duration: 3000
+            });
+          }
+        );
       }
     });
   }
@@ -78,10 +106,17 @@ export class StandardService {
       uploadUrl = '/cloudinary';
     }
 
-    return this.http.post(environment.apiUrl + uploadUrl + '/upload', formData).toPromise().then((res: any) => {
-      this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
-      return res;
-    });
+    return this.http
+      .post(environment.apiUrl + uploadUrl + '/upload', formData)
+      .toPromise()
+      .then((res: any) => {
+        this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+        return res;
+      })
+      .catch((res: any) => {
+        this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
+        return res.error;
+      });
   }
 
   sort(sort: Sort, callback) {

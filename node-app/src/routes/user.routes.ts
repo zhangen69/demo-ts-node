@@ -28,7 +28,14 @@ router.post('/register', (req, res) => {
     });
 });
 
-router.post('/login', (req, res) => {});
+router.post('/login', (req, res) => {
+    UserController.login(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
 router.post('/logout', (req, res) => {});
 router.put('/changePassword', (req, res) => {});
 router.get('/fetchProfile', (req, res) => {});

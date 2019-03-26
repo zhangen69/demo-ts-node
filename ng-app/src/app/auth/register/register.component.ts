@@ -1,4 +1,4 @@
-import { UserService } from './../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder } from '@angular/forms';
 
@@ -16,13 +16,13 @@ export class RegisterComponent implements OnInit {
     phoneNumber: ['', Validators.required],
   });
 
-  constructor(private formBuilder: FormBuilder, private service: UserService) { }
+  constructor(private formBuilder: FormBuilder, private authService: AuthService) { }
 
   ngOnInit() {
   }
 
   onSubmit(formData: any) {
-    this.service.register(formData);
+    this.authService.register(formData);
   }
 
 }

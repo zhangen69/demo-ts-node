@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import Promise from 'promise';
 import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/userLogin.interface';
 import QueryModel from '../models/query.model';
@@ -31,7 +32,30 @@ class Controller {
         });
     }
 
-    login(model: IUserLogin) {}
+    login(model: IUserLogin) {
+        return new Promise((resolve, reject) => {
+            User.findOne({ username: model.username }).then((user: any) => {
+                if (!user || !bcrypt.compareSync(model.password, user.passwordHash)) {
+                    return reject({
+                        status: 401,
+                        message: 'Username or Password are incorrect. Please try again',
+                    });
+                }
+
+                const token = jwt.sign(
+                    { username: user.username, _id: user._id },
+                    'secret this should be longer',
+                    { expiresIn: '1m' },
+                );
+
+                return resolve({
+                    status: 200,
+                    message: `logged in!`,
+                    token,
+                });
+            });
+        });
+    }
 
     logout(model: IUserLogin) {}
 

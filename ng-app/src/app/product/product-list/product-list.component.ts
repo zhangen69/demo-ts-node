@@ -1,7 +1,8 @@
+import { AuthService } from './../../services/auth.service';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Product } from '../../models/product.model';
 import { MatTableDataSource, MatSort, MatPaginator, Sort } from '@angular/material';
-import { merge } from 'rxjs';
+import { merge, Subscription } from 'rxjs';
 import { StandardService } from 'src/app/services/standard.service';
 import { IQueryModel } from 'src/app/interfaces/query-model';
 
@@ -11,6 +12,7 @@ import { IQueryModel } from 'src/app/interfaces/query-model';
   styleUrls: ['./product-list.component.css']
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
+  isAuth = false;
   products: MatTableDataSource<Product>;
   displayedColumns: string[] = ['name', 'price', 'audit.updatedDate', 'action'];
   totalItems = 0;
@@ -18,12 +20,17 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     pageSize: 5,
     currentPage: 0,
   };
+  private authListenerSubs: Subscription;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private service: StandardService) {
+  constructor(private service: StandardService, private authService: AuthService) {
     this.service.init('product', this.queryModel);
+    this.isAuth = this.authService.getIsAuth();
+    this.authListenerSubs = this.authService.getAuthStatusListener().subscribe(isAuth => {
+      this.isAuth = isAuth;
+    });
   }
 
   ngOnInit() {
