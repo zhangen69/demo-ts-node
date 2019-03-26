@@ -52,6 +52,7 @@ class Controller {
                     status: 200,
                     message: `logged in!`,
                     token,
+                    expiresIn: 60,
                 });
             });
         });

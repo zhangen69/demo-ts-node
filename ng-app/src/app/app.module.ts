@@ -29,6 +29,7 @@ import { ConfirmationDialogComponent } from './templates/confirmation-dialog/con
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { HeaderComponent } from './header/header.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { HeaderComponent } from './header/header.component';
     ConfirmationDialogComponent,
     LoginComponent,
     RegisterComponent,
-    HeaderComponent
+    HeaderComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
