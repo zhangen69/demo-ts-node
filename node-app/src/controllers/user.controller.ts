@@ -9,8 +9,12 @@ class UserController {
     register(model: IUserRegister) {}
 
     login(model: IUserLogin) {}
+    
+    logout(model: IUserLogin) {}
 
     changePassword(model: IChangePasswordRequest) {}
+
+    fetchProfile(id: string) {}
 
     updateProfile(model: IUser) {}
 
