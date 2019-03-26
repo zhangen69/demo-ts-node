@@ -8,14 +8,22 @@ table { width: 100%; }
   margin: 0 auto;
 }
 
-.mat-card.card-sm {
+.mat-card.card-xs {
   max-width: 576px;
 }
 
-.mat-card.card-md {
+.mat-card.card-sm {
   max-width: 768px;
 }
 
-.mat-card.card-lg {
+.mat-card.card-md {
   max-width: 992px;
+}
+
+.mat-card.card-lg {
+  max-width: 1200px;
+}
+
+.mat-card[class*="card-"] form > mat-form-field {
+  width: 100%;
 }
