@@ -10,7 +10,8 @@
         "object-literal-sort-keys": false,
         "interface-name": false,
         "max-line-length": false,
-        "member-access": false
+        "member-access": false,
+        "no-empty": false
     },
     "rulesDirectory": []
 }

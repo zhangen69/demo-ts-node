@@ -13,6 +13,8 @@ const schema = new mongoose.Schema({
     isResetPasswordLocked: { type: Boolean, default: false },
     resetPasswordToken: { type: String, default: null },
     lastLoggedIn: { type: Date, default: null },
+    accessFailedCount: { type: Number, default: 0 },
+    isAccessFailedLocked: { type: Boolean, default: false },
 });
 
 schema.add(auditable);
