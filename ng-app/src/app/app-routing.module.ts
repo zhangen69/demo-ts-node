@@ -3,12 +3,17 @@ import { ProductFormComponent } from './product/product-form/product-form.compon
 import { ProductListComponent } from './product/product-list/product-list.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { RegisterComponent } from './auth/register/register.component';
 
 const routes: Routes = [
-  { path: 'product/list', component: ProductListComponent },
-  { path: 'product/add', component: ProductFormComponent },
-  { path: 'product/edit/:id', component: ProductFormComponent },
-  { path: 'auth/login', component: LoginComponent }
+  { path: 'product', children: [
+    { path: 'list', component: ProductListComponent },
+    { path: 'add', component: ProductFormComponent },
+  ]},
+  { path: 'auth', children: [
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
+  ]},
 ];
 
 @NgModule({

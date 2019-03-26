@@ -1,4 +1,5 @@
 import express from 'express';
+import { UserController } from '../controllers/user.controller';
 
 const router = express.Router();
 
@@ -19,7 +20,14 @@ const router = express.Router();
  * 5. Create a new user
 */
 
-router.post('/register', (req, res) => {});
+router.post('/register', (req, res) => {
+    UserController.register(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
 router.post('/login', (req, res) => {});
 router.post('/logout', (req, res) => {});
 router.put('/changePassword', (req, res) => {});

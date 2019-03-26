@@ -7,6 +7,7 @@ import configs from '../configs/app.configs';
 import NgAppRoutes from '../routes/ng-app.routes';
 import productRoutes from '../routes/product.routes';
 import uploaderRoutes from '../routes/uploader.routes';
+import userRoutes from '../routes/user.routes';
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ router.use(uploaderRoutes);
 
 // apply service routes
 router.use('/service', productRoutes);
+router.use('/service/user', userRoutes);
 
 // apply ng-app routes, public folders
 router.use(NgAppRoutes);

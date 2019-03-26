@@ -6,6 +6,7 @@ interface IUserLogin {
 interface IUserRegister {
     username: string;
     password: string;
+    passwordHash: string;
     displayName: string;
     email: string;
     phoneNumber: string;
