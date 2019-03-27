@@ -63,6 +63,7 @@ export class AuthService {
     this.authStatusListerner.next(false);
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
+    this.snackBar.open('Logged Out!', 'Dismiss', { duration: 3000 });
     this.router.navigate(['/']);
   }
 

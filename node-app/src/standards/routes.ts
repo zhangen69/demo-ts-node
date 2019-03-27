@@ -20,7 +20,6 @@ export default class StandardRoutes {
         });
 
         router.get(`/${this.modelName}/:id`, (req, res) => {
-            // res.send(req.params.id);
             this.resHandling(res, this.modelService.fetch(req.params.id));
         });
 
