@@ -1,4 +1,4 @@
-import { checkAuth } from '../middlewares/checkAuth';
+import { checkAuth } from "../middlewares/checkAuth";
 
 export default class StandardRoutes {
     private modelName: string;
@@ -16,20 +16,20 @@ export default class StandardRoutes {
         }
 
         router.post(`/${this.modelName}`, checkAuth, (req, res) => {
-            this.resHandling(res, this.modelService.create(req.body));
+            this.resHandling(res, this.modelService.create(req.body, req.auth));
         });
 
-        router.get(`/${this.modelName}/:id`, (req, res) => {
+        router.get(`/${this.modelName}/:id`, checkAuth, (req, res) => {
             this.resHandling(res, this.modelService.fetch(req.params.id));
         });
 
-        router.get(`/${this.modelName}`, (req, res) => {
+        router.get(`/${this.modelName}`, checkAuth, (req, res) => {
             const queryModel = req.query.queryModel || '{}';
             this.resHandling(res, this.modelService.fetchAll(JSON.parse(queryModel)));
         });
 
         router.put(`/${this.modelName}/`, checkAuth, (req, res) => {
-            this.resHandling(res, this.modelService.update(req.body));
+            this.resHandling(res, this.modelService.update(req.body, req.auth));
         });
 
         router.delete(`/${this.modelName}/:id`, checkAuth, (req, res) => {

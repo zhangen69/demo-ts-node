@@ -13,7 +13,7 @@ export class AuthService {
   private token: string;
   private tokenTimer: any;
   private authStatusListerner = new Subject<boolean>();
-  private apiUrl = environment.apiUrl + '/service/user';
+  private apiUrl = environment.apiUrl + '/api/user';
 
   constructor(private http: HttpClient, private snackBar: MatSnackBar, private router: Router) { }
 

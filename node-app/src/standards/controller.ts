@@ -16,7 +16,10 @@ export default class StandardController {
 
     // CRUD functions - create, fetch, fetchAll, update, delete
 
-    public create(model) {
+    public create(model, auth) {
+        if (auth.isAuth) {
+            model.audit = { updatedBy: auth.user._id, createdBy: auth.user._id };
+        }
         const newModel = new this.model(model);
         return new Promise((fulfill, reject) => {
             newModel.save().then((data) => {
@@ -79,12 +82,12 @@ export default class StandardController {
         });
     }
 
-    public update(model) {
+    public update(model, auth) {
         return new Promise((fulfill, reject) => {
             this.model.findById(model._id).then((doc) => {
                 if (doc == null) { throw new Error(`${this.modelName} not found!`); }
 
-                doc.updateOne(this._getUpdateConditions(model)).then(() => {
+                doc.updateOne(this._getUpdateConditions(model, auth)).then(() => {
                     this.model.findById(model._id).then((data) => {
                         const result = {
                             status: 201,
@@ -126,14 +129,19 @@ export default class StandardController {
         });
     }
 
-    private _getUpdateConditions(model) {
+    private _getUpdateConditions(model, auth) {
         const updateModel: IMongooseQueryModel = { $set: model };
 
         if (model.hasOwnProperty('audit')) {
+            if (auth.isAuth) {
+                model.audit.updatedBy = auth.user._id;
+            }
+
             Object.keys(model.audit).forEach((key) => updateModel.$set[`audit.${key}`] = model.audit[key]);
             delete updateModel.$set.audit;
             delete updateModel.$set['audit.updatedDate'];
             updateModel.$currentDate = { 'audit.updatedDate': { $type: 'date' } };
+            console.log(updateModel);
         }
 
         return updateModel;
