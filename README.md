@@ -32,8 +32,8 @@
 ### Angular App
 - [x] Standard Services (Model-Based)
 - [x] Upload Images (cloudinary & multer)
-- [ ] Auth (JWT)
-- [ ] HTTP Interception (Header-Authorization)
+- [x] Auth (JWT)
+- [x] HTTP Interception (Header-Authorization)
 - [ ] Generate Rules
 - [ ] Standard Form (Form Field, Validation, ...) 
 - [ ] Standard List (Data-Table, Action, Button, Search, ...)
@@ -46,7 +46,7 @@
   - [ ] Generate Sample Report
   - [ ] Generate Report Service (Service Layer)
   - [ ] Report Templates
-- [ ] Auth (JWT)
+- [x] Auth (JWT)
 - [ ] Standard Model Inheritance Classes & Properties (Auditable, Documentable)
   - [x] Auditable
   - [ ] Documentable
@@ -64,8 +64,8 @@
 
 ### WebApp
 - [ ] User & Auth
-  - [ ] Login
-  - [ ] Registration
+  - [x] Login
+  - [x] Registration
   - [ ] Forgot Password
   - [ ] Reset Password
   - [ ] Access Failed Lock
