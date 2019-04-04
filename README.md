@@ -66,6 +66,7 @@
 - [ ] User & Auth
   - [x] Login
   - [x] Registration
+  - [ ] CRUD
   - [ ] Forgot Password
   - [ ] Reset Password
   - [ ] Access Failed Lock
