@@ -12,7 +12,8 @@
         "max-line-length": false,
         "member-access": false,
         "no-empty": false,
-        "jsdoc-format": false
+        "jsdoc-format": false,
+        "forin": false
     },
     "rulesDirectory": []
 }

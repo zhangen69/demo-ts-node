@@ -30,6 +30,8 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
+import { UserListComponent } from './user/user-list/user-list.component';
+import { UserFormComponent } from './user/user-form/user-form.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,9 @@ import { HomeComponent } from './home/home.component';
     LoginComponent,
     RegisterComponent,
     HeaderComponent,
-    HomeComponent
+    HomeComponent,
+    UserListComponent,
+    UserFormComponent
   ],
   imports: [
     BrowserModule,

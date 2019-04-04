@@ -43,7 +43,16 @@ router.put('/updateProfile', (req, res) => {});
 router.post('/emailConfirmed', (req, res) => {});
 router.post('/forgotPassword', (req, res) => {});
 router.post('/verifyResetPasswordToken', (req, res) => {});
-router.get('/', (req, res) => {});
+
+router.get('/', (req, res) => {
+    const queryModel = req.query.queryModel ? JSON.parse(req.query.queryModel) : {};
+    UserController.fetchAll(queryModel).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
 router.post('/', (req, res) => {});
 router.get('/:id', (req, res) => {});
 router.put('/', (req, res) => {});

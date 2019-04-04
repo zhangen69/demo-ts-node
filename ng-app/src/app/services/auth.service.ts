@@ -57,6 +57,19 @@ export class AuthService {
     return this.isAuth;
   }
 
+  getIsExpiredToken() {
+    return;
+    // const now = new Date();
+    // const expiresIn = data.expiration.getTime() - now.getTime();
+
+    // if (expiresIn > 0) {
+    //   this.token = data.token;
+    //   this.isAuth = true;
+    //   this.setAuthTimer(expiresIn);
+    //   this.authStatusListerner.next(true);
+    // }
+  }
+
   logout() {
     this.token = null;
     this.isAuth = false;

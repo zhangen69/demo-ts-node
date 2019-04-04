@@ -1,6 +1,7 @@
 <mat-toolbar>
   <span routerLink="/">Ng-Node App</span>
   <a routerLink="/product/list" mat-button *ngIf="isAuth">Products</a>
+  <a routerLink="/user/list" mat-button *ngIf="isAuth">Users</a>
   <a routerLink="/auth/login" mat-button *ngIf="!isAuth">Login</a>
   <a routerLink="/auth/register" mat-button *ngIf="!isAuth">Sign Up</a>
   <a mat-button (click)="onLogout()" *ngIf="isAuth">Logout</a>

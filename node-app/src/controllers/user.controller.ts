@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Promise from 'promise';
-import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/userLogin.interface';
+import { mapToUserDTO } from '../DTOs/user.dto';
+import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/user.interface';
 import QueryModel from '../models/query.model';
 import User from '../models/user.model';
 
@@ -73,7 +74,30 @@ class Controller {
     verifyResetPasswordToken(model: IVerifyTokenRequest) {}
 
     // admin
-    fetchAll(queryModel: QueryModel) {}
+    fetchAll(queryModel: QueryModel) {
+        return new Promise((resolve, reject) => {
+            const { conditions, selections, options } = new QueryModel(queryModel).getQuery();
+
+            User.estimatedDocumentCount(conditions).then((count) => {
+                User.find(conditions, selections, options, (err, docs: any) => {
+                    if (err) {
+                        reject(err);
+                    }
+                }).then((data: any) => {
+                    const result = {
+                        status: 200,
+                        message: `users fetched all successfully!`,
+                        data: mapToUserDTO(data),
+                        totalItems: count,
+                        currentPage: queryModel.currentPage,
+                        totalPages: Math.ceil(count / queryModel.pageSize),
+                    };
+
+                    resolve(result);
+                });
+            });
+        });
+    }
 
     create(model: IUserRegister) {}
 

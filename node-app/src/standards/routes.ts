@@ -1,4 +1,4 @@
-import { checkAuth } from "../middlewares/checkAuth";
+import { checkAuth } from '../middlewares/checkAuth';
 
 export default class StandardRoutes {
     private modelName: string;

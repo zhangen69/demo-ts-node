@@ -15,10 +15,10 @@ interface IUserRegister {
 }
 
 interface IUser {
-    _id: string;
-    displayName: string;
-    email: string;
-    phoneNumber: string;
+    _id?: string;
+    displayName?: string;
+    email?: string;
+    phoneNumber?: string;
     avatarImageUrl?: string;
     signatureImageUrl?: string;
 }

@@ -1,0 +1,53 @@
+<div class="action-group">
+  <a [routerLink]="['/user/add']" mat-raised-button><mat-icon>insert_drive_file</mat-icon> New User</a>
+</div>
+
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" (matSortChange)="sortData($event)">
+  <!-- Username Column -->
+  <ng-container matColumnDef="username">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Username </th>
+    <td mat-cell *matCellDef="let item"> {{item.username}} </td>
+  </ng-container>
+
+  <!-- Display Name Column -->
+  <ng-container matColumnDef="displayName">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Display Name </th>
+    <td mat-cell *matCellDef="let item"> {{item.displayName}} </td>
+  </ng-container>
+
+  <!-- Display Name Column -->
+  <ng-container matColumnDef="email">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+    <td mat-cell *matCellDef="let item"> {{item.email}} </td>
+  </ng-container>
+
+  <!-- Display Name Column -->
+  <ng-container matColumnDef="phoneNumber">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone Number </th>
+    <td mat-cell *matCellDef="let item"> {{item.phoneNumber}} </td>
+  </ng-container>
+
+  <!-- Price Column -->
+  <ng-container matColumnDef="audit.updatedDate">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated </th>
+    <td mat-cell *matCellDef="let item"> {{item.audit.updatedDate | date: 'hh:mm a, dd-MM-yyyy'}} </td>
+  </ng-container>
+
+  <!-- Action Column -->
+  <ng-container matColumnDef="action">
+    <th mat-header-cell *matHeaderCellDef> Action </th>
+    <td mat-cell *matCellDef="let item">
+      <div class="btn-group" *ngIf="isAuth">
+          <button mat-stroked-button [routerLink]="['/user/edit', item._id]" routerLinkActive="router-link-active"><mat-icon>edit</mat-icon> Edit</button>
+          <button mat-stroked-button color="warn" (click)="delete(item)"><mat-icon>delete</mat-icon> Delete</button>
+      </div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<mat-paginator [length]="totalItems" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+
+
