@@ -2,10 +2,11 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { MatDialog, MatSnackBar, Sort } from '@angular/material';
+import { MatDialog, Sort } from '@angular/material';
 import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/confirmation-dialog.component';
 import { IQueryModel } from '../interfaces/query-model';
 import { UploadType } from '../enums/upload-type.enum';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +19,8 @@ export class StandardService {
   constructor(
     private http: HttpClient,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   init(domain, queryModel = null) {
@@ -30,25 +31,21 @@ export class StandardService {
 
   create(formData) {
     this.http.post(this.apiUrl, formData).subscribe(
-      (data: any) => {
-        this.snackBar.open(data.message, 'Dismiss', { duration: 3000 });
+      (res: any) => {
+        this.toastr.success(res.message);
         this.router.navigate([`/${this.domain}/list`]);
       },
-      (res: any) => {
-        this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
-      }
+      (res: any) => this.toastr.error(res.error.message)
     );
   }
 
   update(formData) {
     this.http.put(this.apiUrl, formData).subscribe(
       (res: any) => {
-        this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+        this.toastr.success(res.message);
         this.router.navigate([`/${this.domain}/list`]);
       },
-      (res: any) => {
-        this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
-      }
+      (res: any) => this.toastr.error(res.error.message)
     );
   }
 
@@ -58,8 +55,7 @@ export class StandardService {
     if (formData !== null) {
       fetchData.subscribe(
         (res: any) => (formData = res.data),
-        (res: any) =>
-          this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 })
+        (res: any) => this.toastr.error(res.error.message)
       );
       return;
     }
@@ -83,14 +79,10 @@ export class StandardService {
       if (result) {
         this.http.delete(this.apiUrl + '/' + result._id).subscribe(
           (res: any) => {
-            this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+            this.toastr.success(res.message);
             window.location.reload();
           },
-          (res: any) => {
-            this.snackBar.open(res.error.message, 'Dismiss', {
-              duration: 3000
-            });
-          }
+          (res: any) => this.toastr.error(res.error.message)
         );
       }
     });
@@ -110,11 +102,11 @@ export class StandardService {
       .post(environment.apiUrl + uploadUrl + '/upload', formData)
       .toPromise()
       .then((res: any) => {
-        this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+        this.toastr.success(res.message);
         return res;
       })
       .catch((res: any) => {
-        this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
+        this.toastr.success(res.error.message);
         return res.error;
       });
   }

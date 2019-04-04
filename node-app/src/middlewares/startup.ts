@@ -25,7 +25,7 @@ router.use(uploaderRoutes);
 
 // apply service routes
 router.use('/service', productRoutes);
-router.use('/api/user', userRoutes);
+router.use('/service/user', userRoutes);
 
 // apply ng-app routes, public folders
 router.use(NgAppRoutes);

@@ -1,0 +1,16 @@
+.image-wrapper .input-file {
+  visibility: hidden;
+}
+
+.image-wrapper .image-picker {
+  margin: 1rem 0;
+}
+
+.image-wrapper .image-preview {
+  height: 5rem;
+  margin: 1rem 0;
+}
+
+.image-wrapper .image-preview img {
+  height: 100%;
+}

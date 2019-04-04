@@ -1,5 +1,5 @@
+import { ToastrService } from 'ngx-toastr';
 import { StandardService } from 'src/app/services/standard.service';
-import { MatSnackBar } from '@angular/material';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
@@ -17,7 +17,7 @@ export class ProductFormComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private service: StandardService,
-    private snackBar: MatSnackBar
+    private toastr: ToastrService
   ) {
     this.service.init('product');
   }
@@ -44,11 +44,7 @@ export class ProductFormComponent implements OnInit {
       reader.readAsDataURL(file);
       this.pickedImage = file;
     } else {
-      this.snackBar.open(
-        'Invalid MIME type, please select JPEG or PNG type image.',
-        'Dismiss',
-        { duration: 3000 }
-      );
+      this.toastr.error('Invalid MIME type, please select JPEG or PNG type image.');
     }
   }
 

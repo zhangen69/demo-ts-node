@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -13,16 +14,16 @@ export class AuthService {
   private token: string;
   private tokenTimer: any;
   private authStatusListerner = new Subject<boolean>();
-  private apiUrl = environment.apiUrl + '/api/user';
+  private apiUrl = environment.apiUrl + '/service/user';
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar, private router: Router) { }
+  constructor(private http: HttpClient, private snackBar: MatSnackBar, private router: Router, private toastr: ToastrService) { }
 
   register(formData) {
     this.http.post(this.apiUrl + '/register', formData).subscribe((res: any) => {
-      this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+      this.toastr.success(res.message);
       this.router.navigate(['/auth/login']);
     }, (res: any) => {
-      this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
+      this.toastr.error(res.error.message);
     });
   }
 
@@ -37,11 +38,11 @@ export class AuthService {
         const now = new Date();
         const expiration = new Date(now.getTime() + (expiresIn * 1000));
         this.saveAuthData(this.token, expiration);
-        this.snackBar.open(res.message, 'Dismiss', { duration: 3000 });
+        this.toastr.success(res.message);
         this.router.navigate(['/']);
       }
     }, (res: any) => {
-      this.snackBar.open(res.error.message, 'Dismiss', { duration: 3000 });
+      this.toastr.error(res.error.message);
     });
   }
 
@@ -55,19 +56,6 @@ export class AuthService {
 
   getIsAuth() {
     return this.isAuth;
-  }
-
-  getIsExpiredToken() {
-    return;
-    // const now = new Date();
-    // const expiresIn = data.expiration.getTime() - now.getTime();
-
-    // if (expiresIn > 0) {
-    //   this.token = data.token;
-    //   this.isAuth = true;
-    //   this.setAuthTimer(expiresIn);
-    //   this.authStatusListerner.next(true);
-    // }
   }
 
   logout() {

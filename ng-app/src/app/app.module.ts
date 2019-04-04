@@ -17,6 +17,7 @@ import {
   MatIconModule
 } from '@angular/material';
 import { FileUploadModule } from 'ng2-file-upload';
+import { ToastrModule } from 'ngx-toastr';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -55,6 +56,10 @@ import { UserFormComponent } from './user/user-form/user-form.component';
     ReactiveFormsModule,
     FlexLayoutModule,
     FileUploadModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-bottom-right',
+    }),
     MatToolbarModule,
     MatButtonModule,
     MatTableModule,

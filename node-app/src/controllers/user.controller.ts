@@ -46,14 +46,14 @@ class Controller {
                 const token = jwt.sign(
                     { username: user.username, _id: user._id },
                     'secret this should be longer',
-                    { expiresIn: '1m' },
+                    { expiresIn: '1d' },
                 );
 
                 return resolve({
                     status: 200,
                     message: `logged in!`,
                     token,
-                    expiresIn: 60,
+                    expiresIn: 60 * 60 * 24,
                 });
             });
         });

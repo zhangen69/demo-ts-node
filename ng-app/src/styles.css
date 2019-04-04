@@ -27,3 +27,35 @@ table { width: 100%; }
 .mat-card[class*="card-"] form > mat-form-field {
   width: 100%;
 }
+
+.standard-table-mat-table .mat-column-audit-updatedDate {
+  width: 150px;
+}
+
+.standard-table-mat-table .mat-column-action {
+  width: 200px;
+  text-align: center;
+}
+
+.standard-table-mat-table .mat-column-action button {
+  padding: 0 8px;
+  margin: 0 5px;
+}
+
+.image-wrapper .input-file {
+  visibility: hidden;
+}
+
+.image-wrapper .image-picker {
+  margin: 1rem 0;
+}
+
+.image-wrapper .image-preview {
+  height: 5rem;
+  margin: 1rem 0;
+}
+
+.image-wrapper .image-preview img {
+  height: 100%;
+}
+
