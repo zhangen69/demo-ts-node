@@ -21,14 +21,14 @@ export default class StandardController {
             model.audit = { updatedBy: auth.user._id, createdBy: auth.user._id };
         }
         const newModel = new this.model(model);
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             newModel.save().then((data) => {
                 const result = {
                     status: 201,
                     message: `${this.modelName} created successfully!`,
                     data,
                 };
-                fulfill(result);
+                resolve(result);
             }).catch((error) => {
                 const result = {
                     status: 500,
@@ -41,7 +41,7 @@ export default class StandardController {
     }
 
     public fetch(id) {
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             this.model.findById(id).then((data) => {
                 if (data == null) { throw new Error('Product not found!'); }
 
@@ -50,7 +50,7 @@ export default class StandardController {
                     message: `${this.modelName} fetched successfully!`,
                     data,
                 };
-                fulfill(result);
+                resolve(result);
             }).catch((error) => {
                 const result = {
                     status: 500,
@@ -63,7 +63,7 @@ export default class StandardController {
     }
 
     public fetchAll(queryModel) {
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             const query = new QueryModel(queryModel).getQuery();
 
             this.model.estimatedDocumentCount(query.conditions).then((count) => {
@@ -76,14 +76,14 @@ export default class StandardController {
                         currentPage: queryModel.currentPage,
                         totalPages: Math.ceil(count / queryModel.pageSize),
                     };
-                    fulfill(result);
+                    resolve(result);
                 });
             });
         });
     }
 
     public update(model, auth) {
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             this.model.findById(model._id).then((doc) => {
                 if (doc == null) { throw new Error(`${this.modelName} not found!`); }
 
@@ -94,7 +94,7 @@ export default class StandardController {
                             message: `${this.modelName} updated successfully!`,
                             data,
                         };
-                        fulfill(result);
+                        resolve(result);
                     });
                 });
             }).catch((error) => {
@@ -109,7 +109,7 @@ export default class StandardController {
     }
 
     public delete(id) {
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             this.model.findByIdAndDelete(id).then((data) => {
                 if (data == null) { throw new Error(`${this.modelName} not found!`); }
 
@@ -117,7 +117,7 @@ export default class StandardController {
                     status: 200,
                     message: `${this.modelName} deleted successfully!`,
                 };
-                fulfill(result);
+                resolve(result);
             }).catch((error) => {
                 const result = {
                     status: 500,

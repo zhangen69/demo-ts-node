@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Promise from 'promise';
 import { mapColletionToUserDTO, mapDocToUserDTO } from '../DTOs/user.dto';
+import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.interface';
 import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/user.interface';
 import QueryModel from '../models/query.model';
 import User from '../models/user.model';
@@ -59,19 +60,33 @@ class Controller {
         });
     }
 
-    logout(model: IUserLogin) {}
+    logout(model: IUserLogin) {
+        return new Promise((resolve, reject) => {});
+    }
 
-    changePassword(model: IChangePasswordRequest) {}
+    changePassword(model: IChangePasswordRequest) {
+        return new Promise((resolve, reject) => {});
+    }
 
-    fetchProfile(id: string) {}
+    fetchProfile(id: string) {
+        return new Promise((resolve, reject) => {});
+    }
 
-    updateProfile(model: IUser) {}
+    updateProfile(model: IUser) {
+        return new Promise((resolve, reject) => {});
+    }
 
-    emailConfirmed(model: IEmailConfirmRequest) {}
+    emailConfirmed(model: IEmailConfirmRequest) {
+        return new Promise((resolve, reject) => {});
+    }
 
-    forgotPassword(model: IForgotPasswordRequest) {}
+    forgotPassword(model: IForgotPasswordRequest) {
+        return new Promise((resolve, reject) => {});
+    }
 
-    verifyResetPasswordToken(model: IVerifyTokenRequest) {}
+    verifyResetPasswordToken(model: IVerifyTokenRequest) {
+        return new Promise((resolve, reject) => {});
+    }
 
     // admin
     fetch(id: string) {
@@ -117,16 +132,60 @@ class Controller {
         });
     }
 
-    create(model: IUserRegister) {}
+    create(model: IUserRegister) {
+        return this.register(model);
+    }
 
-    update(model: IUser) {}
+    update(model: IUser, auth) {
+        return new Promise((resolve, reject) => {
+            User.findById(model._id, (err, doc) => {
+                if (err) {
+                    reject(err);
+                }
+            }).then((user) => {
+                if (user == null) { throw new Error(`user not found!`); }
 
-    lock(model: IUser) {}
+                user.updateOne(this._getUpdateConditions(model, auth)).then((doc) => {
+                    const result = {
+                        status: 201,
+                        message: `user updated successfully!`,
+                    };
 
-    unlock(model: IUser) {}
+                    resolve(result);
+                });
+            });
+        });
+    }
 
-    resetPassword(model: IUser) {}
+    lock(model: IUser) {
+        return new Promise((resolve, reject) => {});
+    }
 
+    unlock(model: IUser) {
+        return new Promise((resolve, reject) => {});
+    }
+
+    resetPassword(model: IUser) {
+        return new Promise((resolve, reject) => {});
+    }
+
+    private _getUpdateConditions(model, auth) {
+        const updateModel: IMongooseQueryModel = { $set: model };
+
+        if (model.hasOwnProperty('audit')) {
+            if (auth.isAuth) {
+                model.audit.updatedBy = auth.user._id;
+            }
+
+            Object.keys(model.audit).forEach((key) => updateModel.$set[`audit.${key}`] = model.audit[key]);
+            delete updateModel.$set.audit;
+            delete updateModel.$set['audit.updatedDate'];
+            updateModel.$currentDate = { 'audit.updatedDate': { $type: 'date' } };
+            console.log(updateModel);
+        }
+
+        return updateModel;
+    }
 }
 
 const UserController = new Controller();

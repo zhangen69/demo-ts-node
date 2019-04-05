@@ -1,5 +1,6 @@
 import express from 'express';
 import { UserController } from '../controllers/user.controller';
+import { checkAuth } from '../middlewares/checkAuth';
 
 const router = express.Router();
 
@@ -44,8 +45,9 @@ router.post('/emailConfirmed', (req, res) => {});
 router.post('/forgotPassword', (req, res) => {});
 router.post('/verifyResetPasswordToken', (req, res) => {});
 
-router.get('/', (req, res) => {
+router.get('/', checkAuth, (req, res) => {
     const queryModel = req.query.queryModel ? JSON.parse(req.query.queryModel) : {};
+
     UserController.fetchAll(queryModel).then((result: any) => {
         res.status(result.status).json(result);
     }).catch((result: any) => {
@@ -53,9 +55,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {});
-
-router.get('/:id', (req, res) => {
+router.get('/:id', checkAuth, (req, res) => {
     UserController.fetch(req.params.id).then((result: any) => {
         res.status(result.status).json(result);
     }).catch((result: any) => {
@@ -63,9 +63,24 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.put('/', (req, res) => {});
-router.post('/lock', (req, res) => {});
-router.post('/unlock', (req, res) => {});
-router.post('/resetPassword', (req, res) => {});
+router.post('/', checkAuth, (req, res) => {
+    UserController.create(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
+router.put('/', checkAuth, (req, res) => {
+    UserController.update(req.body, req.auth).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
+router.post('/lock', checkAuth, (req, res) => {});
+router.post('/unlock', checkAuth, (req, res) => {});
+router.post('/resetPassword', checkAuth, (req, res) => {});
 
 export default router;
