@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Promise from 'promise';
-import { mapToUserDTO } from '../DTOs/user.dto';
+import { mapColletionToUserDTO, mapDocToUserDTO } from '../DTOs/user.dto';
 import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/user.interface';
 import QueryModel from '../models/query.model';
 import User from '../models/user.model';
@@ -74,6 +74,25 @@ class Controller {
     verifyResetPasswordToken(model: IVerifyTokenRequest) {}
 
     // admin
+    fetch(id: string) {
+        return new Promise((resolve, reject) => {
+            User.findById(id, (err, docs: any) => {
+                if (err) {
+                    reject(err);
+                }
+            }).then((doc: any) => {
+                if (doc == null) { throw new Error('Product not found!'); }
+
+                const result = {
+                    status: 200,
+                    data: mapDocToUserDTO(doc),
+                };
+
+                resolve(result);
+            });
+        });
+    }
+
     fetchAll(queryModel: QueryModel) {
         return new Promise((resolve, reject) => {
             const { conditions, selections, options } = new QueryModel(queryModel).getQuery();
@@ -86,8 +105,7 @@ class Controller {
                 }).then((data: any) => {
                     const result = {
                         status: 200,
-                        message: `users fetched all successfully!`,
-                        data: mapToUserDTO(data),
+                        data: mapColletionToUserDTO(data),
                         totalItems: count,
                         currentPage: queryModel.currentPage,
                         totalPages: Math.ceil(count / queryModel.pageSize),
@@ -100,8 +118,6 @@ class Controller {
     }
 
     create(model: IUserRegister) {}
-
-    fetch(id: string) {}
 
     update(model: IUser) {}
 

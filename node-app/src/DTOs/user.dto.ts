@@ -11,6 +11,7 @@ export class UserDTO {
     isResetPasswordLocked: boolean;
     isAccessFailedLocked: boolean;
     lastLoggedIn: Date;
+    audit: any;
 
     constructor(user) {
         this._id = user._id;
@@ -24,11 +25,12 @@ export class UserDTO {
         this.isResetPasswordLocked = user.isResetPasswordLocked;
         this.isAccessFailedLocked = user.isAccessFailedLocked;
         this.lastLoggedIn = user.lastLoggedIn;
+        this.audit = user.audit;
     }
 
 }
 
-export function mapToUserDTO(collection: any): UserDTO[] {
+export function mapColletionToUserDTO(collection: any): UserDTO[] {
     const users: UserDTO[] = [];
 
     for (const index in collection) {
@@ -36,4 +38,8 @@ export function mapToUserDTO(collection: any): UserDTO[] {
     }
 
     return users;
+}
+
+export function mapDocToUserDTO(doc: any): UserDTO {
+    return new UserDTO(doc);
 }

@@ -33,6 +33,7 @@ import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { UserListComponent } from './user/user-list/user-list.component';
 import { UserFormComponent } from './user/user-form/user-form.component';
+import { DisableControlDirective } from './directives/disable-control.directive';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { UserFormComponent } from './user/user-form/user-form.component';
     HeaderComponent,
     HomeComponent,
     UserListComponent,
-    UserFormComponent
+    UserFormComponent,
+    DisableControlDirective
   ],
   imports: [
     BrowserModule,

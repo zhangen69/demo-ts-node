@@ -54,7 +54,15 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {});
-router.get('/:id', (req, res) => {});
+
+router.get('/:id', (req, res) => {
+    UserController.fetch(req.params.id).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
 router.put('/', (req, res) => {});
 router.post('/lock', (req, res) => {});
 router.post('/unlock', (req, res) => {});

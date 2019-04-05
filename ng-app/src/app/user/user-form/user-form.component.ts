@@ -10,8 +10,9 @@ import { FormBuilder, Validators } from '@angular/forms';
   styleUrls: ['./user-form.component.css']
 })
 export class UserFormComponent implements OnInit {
-  mode = 'create';
+  mode = 'new';
   formData = this.formBuilder.group({
+    _id: [''],
     username: ['', Validators.required],
     password: ['', Validators.required],
     displayName: ['', Validators.required],
@@ -34,9 +35,10 @@ export class UserFormComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
       if (params['id']) {
-        this.mode = 'update';
+        this.mode = 'edit';
         this.service.fetch(params['id']).subscribe((res: any) => {
-          this.formData = res.data;
+          this.formData.patchValue(res.data);
+          this.formData.setControl('password', null);
         });
       }
     });
@@ -73,9 +75,9 @@ export class UserFormComponent implements OnInit {
     if (this.imagesPreview.avatarImage !== null) {
       this.onUploadFile();
     } else {
-      if (this.mode === 'update') {
+      if (this.mode === 'edit') {
         this.service.update(this.formData);
-      } else if (this.mode === 'create') {
+      } else if (this.mode === 'new') {
         this.service.create(this.formData);
       }
     }

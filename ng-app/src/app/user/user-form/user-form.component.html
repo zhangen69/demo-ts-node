@@ -6,9 +6,9 @@
   <mat-card-content>
     <form [formGroup]="formData" id="form" class="standard-form" (ngSubmit)="formData.valid && onSubmit(formData.value)">
       <mat-form-field>
-        <input matInput formControlName="username" placeholder="Username" required />
+        <input matInput formControlName="username" placeholder="Username" [disableControl]="mode === 'edit'" required />
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field *ngIf="mode === 'new'">
         <input type="password" matInput formControlName="password" placeholder="Password" required />
       </mat-form-field>
       <mat-form-field>
@@ -45,6 +45,7 @@
           <img [src]="formData.value.signatureImageUrl" *ngIf="formData.value.signatureImageUrl && !imagesPreview.signatureImage">
         </div>
       </div>
+      {{ formData.value | json }}
     </form>
   </mat-card-content>
   <mat-card-actions>
