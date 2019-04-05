@@ -46,7 +46,7 @@ export class ProductService {
   }
 
   delete(item) {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, { data: item });
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, { data: { item } });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {

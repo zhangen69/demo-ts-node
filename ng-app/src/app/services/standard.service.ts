@@ -2,11 +2,12 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { MatDialog, Sort } from '@angular/material';
+import { MatDialog, Sort, MatPaginator } from '@angular/material';
 import { ConfirmationDialogComponent } from '../templates/confirmation-dialog/confirmation-dialog.component';
 import { IQueryModel } from '../interfaces/query-model';
 import { UploadType } from '../enums/upload-type.enum';
 import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,18 +16,29 @@ export class StandardService {
   domain: string;
   apiUrl: string;
   queryModel: IQueryModel;
+  paginator: MatPaginator;
+  refreshListerner = new Subject();
 
   constructor(
-    private http: HttpClient,
-    private dialog: MatDialog,
-    private router: Router,
-    private toastr: ToastrService
+    public http: HttpClient,
+    public dialog: MatDialog,
+    public router: Router,
+    public toastr: ToastrService
   ) {}
 
-  init(domain, queryModel = null) {
+  init(domain, queryModel?, paginator?) {
     this.domain = domain;
     this.apiUrl = `${environment.apiUrl}/service/${this.domain}`;
     this.queryModel = queryModel;
+    this.paginator = paginator;
+  }
+
+  getRefreshListerner() {
+    return this.refreshListerner.asObservable();
+  }
+
+  setRefreshListerner() {
+    this.refreshListerner.next();
   }
 
   create(formData) {
@@ -72,7 +84,7 @@ export class StandardService {
 
   delete(item) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: item
+      data: { item }
     });
 
     dialogRef.afterClosed().subscribe(result => {

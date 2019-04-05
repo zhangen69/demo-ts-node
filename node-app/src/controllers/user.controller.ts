@@ -44,6 +44,13 @@ class Controller {
                     });
                 }
 
+                if (user.isLocked) {
+                    return reject({
+                        status: 423,
+                        message: 'Account is loced, please contact admin to unlock the account.',
+                    });
+                }
+
                 const token = jwt.sign(
                     { username: user.username, _id: user._id },
                     'secret this should be longer',
@@ -157,15 +164,43 @@ class Controller {
         });
     }
 
-    lock(model: IUser) {
-        return new Promise((resolve, reject) => {});
+    lock(model: IUser, auth) {
+        return new Promise((resolve, reject) => {
+            User.findById(model._id).then((doc) => {
+                if (doc == null) { throw new Error(`user not found!`); }
+
+                doc.updateOne({ isLocked: true }).then((res) => {
+                    const result = {
+                        status: 201,
+                        message: `user locked successfully!`,
+                    };
+
+                    resolve(result);
+                });
+
+            });
+        });
     }
 
-    unlock(model: IUser) {
-        return new Promise((resolve, reject) => {});
+    unlock(model: IUser, auth) {
+        return new Promise((resolve, reject) => {
+            User.findById(model._id).then((doc) => {
+                if (doc == null) { throw new Error(`user not found!`); }
+
+                doc.updateOne({ isLocked: false }).then((res) => {
+                    const result = {
+                        status: 201,
+                        message: `user unlocked successfully!`,
+                    };
+
+                    resolve(result);
+                });
+
+            });
+        });
     }
 
-    resetPassword(model: IUser) {
+    resetPassword(model: IUser, auth) {
         return new Promise((resolve, reject) => {});
     }
 

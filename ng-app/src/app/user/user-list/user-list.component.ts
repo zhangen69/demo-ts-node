@@ -1,3 +1,4 @@
+import { UserService } from './../../services/user.service';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatTableDataSource, MatPaginator, MatSort, Sort } from '@angular/material';
 import { User } from 'src/app/models/user.model';
@@ -24,11 +25,14 @@ export class UserListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private service: StandardService, private authService: AuthService) {
-    this.service.init('user', this.queryModel);
+  constructor(private userService: UserService, private authService: AuthService) {
+    this.userService.init('user', this.queryModel, this.paginator);
     this.isAuth = this.authService.getIsAuth();
     this.authService.getAuthStatusListener().subscribe(isAuth => {
       this.isAuth = isAuth;
+    });
+    this.userService.getRefreshListerner().subscribe(() => {
+      this.fetchAll();
     });
   }
 
@@ -45,18 +49,22 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   fetchAll() {
-    this.service.fetchAll(this.queryModel, this.paginator.pageIndex).subscribe((res: any) => {
+    this.userService.fetchAll(this.queryModel, this.paginator.pageIndex).subscribe((res: any) => {
       this.dataSource = new MatTableDataSource<User>(res.data);
       this.dataSource.sort = this.sort;
       this.totalItems = res.totalItems;
     });
   }
 
-  delete(item) {
-    this.service.delete(item);
+  lockOrUnlockUser(item) {
+    if (item.isLocked) {
+      this.userService.unlock(item);
+    } else {
+      this.userService.lock(item);
+    }
   }
 
   sortData(sort: Sort) {
-    this.service.sort(sort, this.fetchAll);
+    this.userService.sort(sort, this.fetchAll);
   }
 }

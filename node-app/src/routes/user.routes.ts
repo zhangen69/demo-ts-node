@@ -79,8 +79,28 @@ router.put('/', checkAuth, (req, res) => {
     });
 });
 
-router.post('/lock', checkAuth, (req, res) => {});
-router.post('/unlock', checkAuth, (req, res) => {});
-router.post('/resetPassword', checkAuth, (req, res) => {});
+router.post('/lock', checkAuth, (req, res) => {
+    UserController.lock(req.body, req.auth).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
+router.post('/unlock', checkAuth, (req, res) => {
+    UserController.unlock(req.body, req.auth).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
+router.post('/resetPassword', checkAuth, (req, res) => {
+    UserController.resetPassword(req.body, req.auth).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
 
 export default router;

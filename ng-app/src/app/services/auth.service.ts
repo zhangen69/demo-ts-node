@@ -16,7 +16,7 @@ export class AuthService {
   private authStatusListerner = new Subject<boolean>();
   private apiUrl = environment.apiUrl + '/service/user';
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar, private router: Router, private toastr: ToastrService) { }
+  constructor(private http: HttpClient, private router: Router, private toastr: ToastrService) { }
 
   register(formData) {
     this.http.post(this.apiUrl + '/register', formData).subscribe((res: any) => {
@@ -64,7 +64,7 @@ export class AuthService {
     this.authStatusListerner.next(false);
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
-    this.snackBar.open('Logged Out!', 'Dismiss', { duration: 3000 });
+    this.toastr.info('Logged Out!');
     this.router.navigate(['/']);
   }
 

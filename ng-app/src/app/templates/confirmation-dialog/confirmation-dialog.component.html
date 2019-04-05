@@ -1,6 +1,7 @@
 <h2>Confirmation</h2>
-<p>Do you want to delete '{{ data.name }}'</p>
+<p *ngIf="!data.message">Do you want to delete '{{ data.name }}'</p>
+<p *ngIf="data.message">{{ data.message }}</p>
 <div class="btn-group" fxLayoutAlign="end start">
   <button type="button" mat-raised-button (click)="onNoClick()">Cancel</button>
-  <button type="button" mat-raised-button color="primary" [mat-dialog-close]="data" cdkFocusInitial>OK</button>
+  <button type="button" mat-raised-button color="primary" [mat-dialog-close]="data.item" cdkFocusInitial>OK</button>
 </div>
