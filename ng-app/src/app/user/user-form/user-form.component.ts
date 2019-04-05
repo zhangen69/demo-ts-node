@@ -67,18 +67,18 @@ export class UserFormComponent implements OnInit {
       this.formData.patchValue({ avatarImageUrl: res.url });
       this.formData.get('avatarImageUrl').updateValueAndValidity();
       this.imagesPreview.avatarImage = null;
-      this.onSubmit();
+      this.onSubmit(this.formData.value);
     });
   }
 
-  onSubmit() {
-    if (this.imagesPreview.avatarImage !== null) {
+  onSubmit(formData) {
+    if (this.imagesPreview.avatarImage) {
       this.onUploadFile();
     } else {
       if (this.mode === 'edit') {
-        this.service.update(this.formData);
+        this.service.update(formData);
       } else if (this.mode === 'new') {
-        this.service.create(this.formData);
+        this.service.create(formData);
       }
     }
   }
