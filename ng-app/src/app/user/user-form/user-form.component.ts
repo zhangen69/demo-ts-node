@@ -12,7 +12,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 export class UserFormComponent implements OnInit {
   mode = 'new';
   formData = this.formBuilder.group({
-    _id: [''],
+    _id: [null],
     username: ['', Validators.required],
     password: ['', Validators.required],
     displayName: ['', Validators.required],
