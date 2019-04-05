@@ -38,7 +38,6 @@ interface IVerifyTokenRequest {
 }
 
 interface IChangePasswordRequest {
-    _id: string;
     username: string;
     password: string;
     newPassword: string;

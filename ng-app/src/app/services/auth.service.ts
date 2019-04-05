@@ -70,6 +70,7 @@ export class AuthService {
 
   autoAuthUser() {
     const data = this.getAuthData();
+
     if (!data) {
       return;
     }

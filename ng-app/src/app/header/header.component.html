@@ -4,5 +4,7 @@
   <a routerLink="/user/list" mat-button *ngIf="isAuth">Users</a>
   <a routerLink="/auth/login" mat-button *ngIf="!isAuth">Login</a>
   <a routerLink="/auth/register" mat-button *ngIf="!isAuth">Sign Up</a>
+  <a routerLink="/user/changePassword" mat-button *ngIf="isAuth">Change Password</a>
+  <a routerLink="/user/profile" mat-button *ngIf="isAuth">My Profile</a>
   <a mat-button (click)="onLogout()" *ngIf="isAuth">Logout</a>
 </mat-toolbar>

@@ -34,6 +34,9 @@ import { HomeComponent } from './home/home.component';
 import { UserListComponent } from './user/user-list/user-list.component';
 import { UserFormComponent } from './user/user-form/user-form.component';
 import { DisableControlDirective } from './directives/disable-control.directive';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { UserProfileComponent } from './user/user-profile/user-profile.component';
+import { UserChangePasswordComponent } from './user/user-change-password/user-change-password.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +50,10 @@ import { DisableControlDirective } from './directives/disable-control.directive'
     HomeComponent,
     UserListComponent,
     UserFormComponent,
-    DisableControlDirective
+    DisableControlDirective,
+    ForgotPasswordComponent,
+    UserProfileComponent,
+    UserChangePasswordComponent
   ],
   imports: [
     BrowserModule,

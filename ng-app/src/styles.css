@@ -28,18 +28,21 @@ table { width: 100%; }
   width: 100%;
 }
 
-.standard-table-mat-table .mat-column-audit-updatedDate {
+.standard-table.mat-table .mat-column-audit-updatedDate {
   width: 150px;
 }
 
-.standard-table-mat-table .mat-column-action {
-  width: 200px;
-  text-align: center;
+.standard-table.mat-table .mat-column-action {
+  width: 250px;
 }
 
-.standard-table-mat-table .mat-column-action button {
+.standard-table.mat-table .mat-column-action button {
   padding: 0 8px;
   margin: 0 5px;
+}
+
+.standard-table.mat-table .mat-column-action button .mat-icon {
+  vertical-align: middle !important;
 }
 
 .image-wrapper .input-file {

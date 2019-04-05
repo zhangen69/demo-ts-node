@@ -16,37 +16,53 @@ export class UserService extends StandardService {
   }
 
   lock(user): void {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: { item: user, message: `Do you want to lock '${user.username}'` }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.http.post(this.apiUrl + '/lock', result).subscribe(
-          (res: any) => {
-            this.toastr.success(res.message);
-            this.setRefreshListerner();
-          },
-          (res: any) => this.toastr.error(res.error.message)
-        );
-      }
-    });
+    const message = `Do you want to lock '${user.username}'`;
+    const url = this.apiUrl + '/lock';
+    this.dialogHandler(user, message, url);
   }
 
   unlock(user): void {
+    const message = `Do you want to unlock '${user.username}'`;
+    const url = this.apiUrl + '/unlock';
+    this.dialogHandler(user, message, url);
+  }
+
+  changePassword(model) {
+    return this.http.post(this.apiUrl + '/changePassword', model).subscribe((res: any) => {
+      this.toastr.success(res.message);
+      this.router.navigate(['/']);
+    }, (res: any) => {
+      this.toastr.error(res.error.message);
+    });
+  }
+
+  private nextCallback(res: any) {
+    this.toastr.success(res.message);
+    this.setRefreshListerner();
+  }
+
+  private httpRequestHandler (req) {
+    if (!req) {
+      console.error('Request not found');
+      this.toastr.error('Request not found');
+      return;
+    }
+
+    req.subscribe(
+      (res: any) => this.nextCallback(res),
+      (res: any) => this.toastr.error(res.error.message)
+    );
+  }
+
+  private dialogHandler (item, message, url) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: { item: user, message: `Do you want to unlock '${user.username}'` }
+      data: { item, message }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.http.post(this.apiUrl + '/unlock', result).subscribe(
-          (res: any) => {
-            this.toastr.success(res.message);
-            this.setRefreshListerner();
-          },
-          (res: any) => this.toastr.error(res.error.message)
-        );
+        const req = this.http.post(url, result);
+        this.httpRequestHandler(req);
       }
     });
   }

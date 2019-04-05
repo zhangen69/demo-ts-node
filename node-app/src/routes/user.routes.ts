@@ -38,7 +38,19 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {});
-router.put('/changePassword', (req, res) => {});
+
+router.post('/changePassword', checkAuth, (req, res) => {
+    if (req.auth.isAuth) {
+        req.body.username = req.auth.user.username;
+    }
+
+    UserController.changePassword(req.body, req.auth).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
 router.get('/fetchProfile', (req, res) => {});
 router.put('/updateProfile', (req, res) => {});
 router.post('/emailConfirmed', (req, res) => {});

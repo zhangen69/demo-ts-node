@@ -71,8 +71,30 @@ class Controller {
         return new Promise((resolve, reject) => {});
     }
 
-    changePassword(model: IChangePasswordRequest) {
-        return new Promise((resolve, reject) => {});
+    changePassword(model: IChangePasswordRequest, auth) {
+        return new Promise((resolve, reject) => {
+            User.findOne({ username: model.username }).then((user: any) => {
+                if (user == null) { throw new Error('Not found user'); }
+
+                if (!bcrypt.compareSync(model.password, user.passwordHash)) {
+                    return reject({
+                        status: 403,
+                        message: 'Password are invalid! Please try again.',
+                    });
+                }
+
+                user.passwordHash = bcrypt.hashSync(model.newPassword, 10);
+
+                user.save().then((data) => {
+                    const result = {
+                        status: 201,
+                        message: `user password changed successfully!`,
+                        data,
+                    };
+                    resolve(result);
+                });
+            });
+        });
     }
 
     fetchProfile(id: string) {
