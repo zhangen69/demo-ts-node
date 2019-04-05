@@ -51,7 +51,14 @@
   - [x] Auditable
   - [ ] Documentable
 - [ ] Standard User (Login, Change Password, Registration, Forgot Password)
+  - [x] Login
+  - [x] Change Password
+  - [x] Registration
+  - [ ] Forgot Password
 - [ ] Standard Role & Authorization
+  - [ ] Role CRUD
+  - [ ] Assign Roles to Users
+  - [ ] Identify Logged In User's Roles
 - [ ] Send Email & Email Queue Service
   - [x] Send Sample Email
   - [ ] Send Email Service (Service Layer)
