@@ -71,7 +71,7 @@
   - [ ] Reset Password
   - [ ] Access Failed Lock
   - [ ] Update Profile
-  - [ ] Change Password
+  - [x] Change Password
 - [ ] Product (or any other collection/module)
   - [x] Standard CRUD
   - [x] Upload Images
