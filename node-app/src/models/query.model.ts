@@ -32,7 +32,7 @@ export default class QueryModel implements IQueryModel {
 
     public getQuery() {
         // query patterns: conditions, select columns, pagination options
-        const conditions = {};
+        const conditions: any = {};
         const selections = null;
         const options = { skip: (this.currentPage * this.pageSize), limit: this.pageSize, sort: {} };
 

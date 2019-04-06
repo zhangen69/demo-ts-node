@@ -16,6 +16,7 @@ interface IUserRegister {
 
 interface IUser {
     _id?: string;
+    username?: string;
     displayName?: string;
     email?: string;
     phoneNumber?: string;
@@ -34,11 +35,17 @@ interface IEmailConfirmRequest {
 }
 
 interface IVerifyTokenRequest {
-    email: string;
     token: string;
 }
 
 interface IChangePasswordRequest {
+    username: string;
+    password: string;
+    newPassword: string;
+}
+
+interface IResetPasswordRequest {
+    token: string;
     username: string;
     password: string;
     newPassword: string;
@@ -52,4 +59,5 @@ export {
     IEmailConfirmRequest,
     IVerifyTokenRequest,
     IChangePasswordRequest,
+    IResetPasswordRequest,
 };

@@ -51,9 +51,28 @@ router.post('/changePassword', checkAuth, (req, res) => {
     });
 });
 
-router.get('/fetchProfile', (req, res) => {});
-router.put('/updateProfile', (req, res) => {});
+router.get('/fetchProfile', checkAuth, (req, res) => {
+    if (!req.auth.isAuth) {
+        res.status(401).json({ message: 'Access Denied' });
+    }
+
+    UserController.fetchProfile(req.auth.user._id).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
+router.put('/updateProfile', checkAuth, (req, res) => {
+    UserController.updateProfile(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
+
 router.post('/emailConfirmed', (req, res) => {});
+
 router.post('/forgotPassword', (req, res) => {
     UserController.forgotPassword(req.body).then((result: any) => {
         res.status(result.status).json(result);
@@ -61,12 +80,13 @@ router.post('/forgotPassword', (req, res) => {
         res.status(result.status).json(result);
     });
 });
+
 router.post('/verifyResetPasswordToken', (req, res) => {});
 
 router.get('/', checkAuth, (req, res) => {
     const queryModel = req.query.queryModel ? JSON.parse(req.query.queryModel) : {};
 
-    UserController.fetchAll(queryModel).then((result: any) => {
+    UserController.fetchAll(queryModel, req.auth).then((result: any) => {
         res.status(result.status).json(result);
     }).catch((result: any) => {
         res.status(result.status).json(result);
@@ -113,8 +133,8 @@ router.post('/unlock', checkAuth, (req, res) => {
     });
 });
 
-router.post('/resetPassword', checkAuth, (req, res) => {
-    UserController.resetPassword(req.body, req.auth).then((result: any) => {
+router.post('/resetPassword', (req, res) => {
+    UserController.resetPassword(req.body).then((result: any) => {
         res.status(result.status).json(result);
     }).catch((result: any) => {
         res.status(result.status).json(result);

@@ -36,6 +36,17 @@ export class UserService extends StandardService {
     });
   }
 
+  fetchProfile() {
+    return this.http.get(this.apiUrl + '/fetchProfile');
+  }
+
+  updateProfile(model) {
+    this.http.put(this.apiUrl + '/updateProfile', model).subscribe((res: any) => {
+      this.toastr.success(res.message);
+      this.router.navigate(['/']);
+    });
+  }
+
   private nextCallback(res: any) {
     this.toastr.success(res.message);
     this.setRefreshListerner();

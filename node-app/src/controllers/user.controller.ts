@@ -4,7 +4,7 @@ import Promise from 'promise';
 import { v4 as uuid } from 'uuid';
 import { mapColletionToUserDTO, mapDocToUserDTO } from '../DTOs/user.dto';
 import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.interface';
-import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/user.interface';
+import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IResetPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/user.interface';
 import QueryModel from '../models/query.model';
 import User from '../models/user.model';
 
@@ -106,11 +106,32 @@ class Controller {
     }
 
     fetchProfile(id: string) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => {
+            User.findById(id).then((user: any) => {
+                if (user == null) { throw new Error('User not found'); }
+
+                return resolve({
+                    status: 200,
+                    data: mapDocToUserDTO(user),
+                });
+            });
+        });
     }
 
     updateProfile(model: IUser) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => {
+            User.findById(model._id).then((user: any) => {
+                if (user === null) { throw new Error('User not found'); }
+
+                user.update(model).then((doc: any) => {
+                    return resolve({
+                        status: 201,
+                        message: 'update profile successfully!',
+                    });
+                });
+            });
+
+        });
     }
 
     emailConfirmed(model: IEmailConfirmRequest) {
@@ -124,11 +145,15 @@ class Controller {
 
                 const set = { isResetPasswordLocked: true, resetPasswordToken: uuid() };
 
+                const url = `http://localhost:4200/auth/resetPassword/${set.resetPasswordToken}`;
+
                 user.update(set).then((data) => {
                     const result = {
                         status: 200,
+                        url,
                         message: `sent forgot password email successfully!`,
                     };
+
                     return resolve(result);
                 });
             });
@@ -136,7 +161,16 @@ class Controller {
     }
 
     verifyResetPasswordToken(model: IVerifyTokenRequest) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => {
+            User.findOne({ resetPasswordToken: model.token }).then((doc: any) => {
+                if (doc == null) { throw new Error('Token is invalid'); }
+
+                return resolve({
+                    status: 200,
+                    verified: true,
+                });
+            });
+        });
     }
 
     // admin
@@ -159,9 +193,14 @@ class Controller {
         });
     }
 
-    fetchAll(queryModel: QueryModel) {
+    fetchAll(queryModel: QueryModel, auth?) {
         return new Promise((resolve, reject) => {
             const { conditions, selections, options } = new QueryModel(queryModel).getQuery();
+
+            if (auth.isAuth) {
+                // $ne as NOT EQUAL, username not equal to current user
+                conditions.username = { $ne: auth.user.username };
+            }
 
             User.estimatedDocumentCount(conditions).then((count) => {
                 User.find(conditions, selections, options, (err, docs: any) => {
@@ -196,7 +235,7 @@ class Controller {
             }).then((user) => {
                 if (user == null) { throw new Error(`user not found!`); }
 
-                user.updateOne(this._getUpdateConditions(model, auth)).then((doc) => {
+                user.update(this._getUpdateConditions(model, auth)).then((doc) => {
                     const result = {
                         status: 201,
                         message: `user updated successfully!`,
@@ -213,7 +252,7 @@ class Controller {
             User.findById(model._id).then((doc) => {
                 if (doc == null) { throw new Error(`user not found!`); }
 
-                doc.updateOne({ isLocked: true }).then((res) => {
+                doc.update({ isLocked: true }).then((res) => {
                     const result = {
                         status: 201,
                         message: `user locked successfully!`,
@@ -231,7 +270,7 @@ class Controller {
             User.findById(model._id).then((doc) => {
                 if (doc == null) { throw new Error(`user not found!`); }
 
-                doc.updateOne({ isLocked: false }).then((res) => {
+                doc.update({ isLocked: false }).then((res) => {
                     const result = {
                         status: 201,
                         message: `user unlocked successfully!`,
@@ -244,8 +283,26 @@ class Controller {
         });
     }
 
-    resetPassword(model: IUser, auth) {
-        return new Promise((resolve, reject) => {});
+    resetPassword(model: IResetPasswordRequest) {
+        return new Promise((resolve, reject) => {
+            User.findOne({ username: model.username, resetPasswordToken: model.token }).then((user: any) => {
+                if (user == null) { throw new Error('Failed to reset password. Username is invalid or token is expired.'); }
+
+                const newPasswordHash = bcrypt.hashSync(model.newPassword, 10);
+                const set = {
+                    passwordHash: newPasswordHash,
+                    resetPasswordToken: null,
+                    isResetPasswordLocked: false,
+                };
+
+                user.update(set).then((res: any) => {
+                    return resolve({
+                        status: 201,
+                        message: 'reseted password successfully!',
+                    });
+                });
+            });
+        });
     }
 
     private _getUpdateConditions(model, auth) {
