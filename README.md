@@ -94,11 +94,11 @@
 - [ ] Standard Model Inheritance Classes & Properties (Auditable, Documentable)
   - [x] Auditable
   - [ ] Documentable
-- [ ] Standard User (Login, Change Password, Registration, Forgot Password)
+- [x] Standard User (Login, Change Password, Registration, Forgot Password)
   - [x] Login
   - [x] Change Password
   - [x] Registration
-  - [ ] Forgot Password
+  - [x] Forgot Password
 - [ ] Standard Role & Authorization
   - [ ] Role CRUD
   - [ ] Assign Roles to Users
@@ -118,8 +118,8 @@
   - [x] Login
   - [x] Registration
   - [x] CRUD
-  - [ ] Forgot Password
-  - [ ] Reset Password
+  - [x] Forgot Password & Reset Password
+  - [ ] Reset Password (by admin)
   - [ ] Access Failed Lock
   - [x] Update Profile
   - [x] Change Password
