@@ -1,6 +1,11 @@
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
+import fs from 'fs';
+import helmet from 'helmet';
 import mongoose from 'mongoose';
+import morgan from 'morgan';
+import path from 'path';
 import configs from '../configs/app.configs';
 
 // import routes
@@ -11,14 +16,11 @@ import userRoutes from '../routes/user.routes';
 
 const router = express.Router();
 
+router.use(helmet());
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: false }));
-router.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    next();
-});
+router.use(cors());
+router.use(morgan('combined', { stream: fs.createWriteStream(path.join(__dirname, '../logs.log'), { flags: 'a' }) }));
 
 // apply uploader routes
 router.use(uploaderRoutes);
