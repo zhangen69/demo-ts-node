@@ -120,7 +120,7 @@
   - [x] CRUD
   - [x] Forgot Password & Reset Password
   - [ ] Reset Password (by admin)
-  - [ ] Access Failed Lock
+  - [x] Access Failed Lock
   - [x] Update Profile
   - [x] Change Password
 - [ ] Product (or any other collection/module)
