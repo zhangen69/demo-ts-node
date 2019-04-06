@@ -121,7 +121,7 @@
   - [ ] Forgot Password
   - [ ] Reset Password
   - [ ] Access Failed Lock
-  - [ ] Update Profile
+  - [x] Update Profile
   - [x] Change Password
 - [ ] Product (or any other collection/module)
   - [x] Standard CRUD
