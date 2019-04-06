@@ -1,3 +1,6 @@
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/services/auth.service';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -6,10 +9,25 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./forgot-password.component.css']
 })
 export class ForgotPasswordComponent implements OnInit {
+  formData = this.fb.group({
+    username: ['', Validators.required],
+    email: ['', Validators.required],
+  });
+  mode = 'new';
 
-  constructor() { }
+  constructor(private fb: FormBuilder, private authService: AuthService, private toastr: ToastrService) { }
 
   ngOnInit() {
+  }
+
+  onSubmit(formData) {
+    console.log(formData);
+
+    this.authService.forgotPassword(formData).subscribe((res: any) => {
+      this.mode = 'sent';
+    }, (res: any) => {
+      this.toastr.error(res.error.message);
+    });
   }
 
 }

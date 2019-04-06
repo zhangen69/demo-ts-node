@@ -147,6 +147,8 @@ class Controller {
 
                 const url = `http://localhost:4200/auth/resetPassword/${set.resetPasswordToken}`;
 
+                // send email service
+
                 user.update(set).then((data) => {
                     const result = {
                         status: 200,
@@ -298,7 +300,7 @@ class Controller {
                 user.update(set).then((res: any) => {
                     return resolve({
                         status: 201,
-                        message: 'reseted password successfully!',
+                        message: 'your password was changed successfully!',
                     });
                 });
             });

@@ -37,6 +37,7 @@ import { DisableControlDirective } from './directives/disable-control.directive'
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 import { UserChangePasswordComponent } from './user/user-change-password/user-change-password.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { UserChangePasswordComponent } from './user/user-change-password/user-ch
     DisableControlDirective,
     ForgotPasswordComponent,
     UserProfileComponent,
-    UserChangePasswordComponent
+    UserChangePasswordComponent,
+    ResetPasswordComponent
   ],
   imports: [
     BrowserModule,

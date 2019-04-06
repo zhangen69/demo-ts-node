@@ -46,6 +46,23 @@ export class AuthService {
     });
   }
 
+  forgotPassword(model) {
+    return this.http.post(this.apiUrl + '/forgotPassword', model);
+  }
+
+  verifyResetPasswordToken(token) {
+    return this.http.post(this.apiUrl + '/verifyResetPasswordToken', { token });
+  }
+
+  resetPassword(model) {
+    this.http.post(this.apiUrl + '/resetPassword', model).subscribe((res: any) => {
+      this.toastr.success(res.message);
+      this.router.navigate(['/auth/login']);
+    }, (res: any) => {
+      this.toastr.error(res.error.message);
+    });
+  }
+
   getToken() {
     return this.token;
   }

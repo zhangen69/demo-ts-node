@@ -47,7 +47,6 @@ interface IChangePasswordRequest {
 interface IResetPasswordRequest {
     token: string;
     username: string;
-    password: string;
     newPassword: string;
 }
 

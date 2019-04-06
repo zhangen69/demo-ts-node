@@ -11,6 +11,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { RegisterComponent } from './auth/register/register.component';
 import { UserListComponent } from './user/user-list/user-list.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 
 const routes: Routes = [
   { path: 'product', canActivate: [AuthGuard], children: [
@@ -29,6 +30,7 @@ const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'forgotPassword', component: ForgotPasswordComponent },
+    { path: 'resetPassword/:token', component: ResetPasswordComponent },
   ]},
   { path: '', component: HomeComponent },
 ];

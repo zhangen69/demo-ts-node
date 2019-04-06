@@ -81,7 +81,13 @@ router.post('/forgotPassword', (req, res) => {
     });
 });
 
-router.post('/verifyResetPasswordToken', (req, res) => {});
+router.post('/verifyResetPasswordToken', (req, res) => {
+    UserController.verifyResetPasswordToken(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
 
 router.get('/', checkAuth, (req, res) => {
     const queryModel = req.query.queryModel ? JSON.parse(req.query.queryModel) : {};
