@@ -54,7 +54,13 @@ router.post('/changePassword', checkAuth, (req, res) => {
 router.get('/fetchProfile', (req, res) => {});
 router.put('/updateProfile', (req, res) => {});
 router.post('/emailConfirmed', (req, res) => {});
-router.post('/forgotPassword', (req, res) => {});
+router.post('/forgotPassword', (req, res) => {
+    UserController.forgotPassword(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
+});
 router.post('/verifyResetPasswordToken', (req, res) => {});
 
 router.get('/', checkAuth, (req, res) => {

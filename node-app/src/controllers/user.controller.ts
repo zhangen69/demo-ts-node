@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Promise from 'promise';
+import { v4 as uuid } from 'uuid';
 import { mapColletionToUserDTO, mapDocToUserDTO } from '../DTOs/user.dto';
 import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.interface';
 import { IChangePasswordRequest, IEmailConfirmRequest, IForgotPasswordRequest, IUser, IUserLogin, IUserRegister, IVerifyTokenRequest } from '../interfaces/user.interface';
@@ -48,6 +49,13 @@ class Controller {
                     return reject({
                         status: 423,
                         message: 'Account is loced, please contact admin to unlock the account.',
+                    });
+                }
+
+                if (user.isResetPasswordLocked) {
+                    return reject({
+                        status: 423,
+                        message: 'Your account is locked by reset password, please check your mailbox to reset your password.',
                     });
                 }
 
@@ -110,7 +118,21 @@ class Controller {
     }
 
     forgotPassword(model: IForgotPasswordRequest) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => {
+            User.findOne({ username: model.username, email: model.email }).then((user: any) => {
+                if (user == null) { return new Error('User not found'); }
+
+                const set = { isResetPasswordLocked: true, resetPasswordToken: uuid() };
+
+                user.update(set).then((data) => {
+                    const result = {
+                        status: 200,
+                        message: `sent forgot password email successfully!`,
+                    };
+                    return resolve(result);
+                });
+            });
+        });
     }
 
     verifyResetPasswordToken(model: IVerifyTokenRequest) {

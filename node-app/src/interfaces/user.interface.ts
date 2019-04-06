@@ -24,6 +24,7 @@ interface IUser {
 }
 
 interface IForgotPasswordRequest {
+    username: string;
     email: string;
 }
 
