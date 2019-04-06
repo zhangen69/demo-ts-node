@@ -21,8 +21,6 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   onSubmit(formData) {
-    console.log(formData);
-
     this.authService.forgotPassword(formData).subscribe((res: any) => {
       this.mode = 'sent';
     }, (res: any) => {

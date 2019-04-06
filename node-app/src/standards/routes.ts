@@ -47,8 +47,7 @@ export default class StandardRoutes {
                 res.status(result.status).json(result);
             });
         } catch (error) {
-            console.log('Error Occurs!');
-            console.error(error);
+            throw new Error(error);
         }
     }
 }

@@ -32,7 +32,7 @@ router.use(NgAppRoutes);
 
 // mongodb connection
 mongoose.connect(configs.mongoose.connection, { useNewUrlParser: true })
-    .then(() => { console.log('Connected to MongoDB!'); })
-    .catch(() => { console.log('Connection failed!'); });
+    .then((res: typeof mongoose) => { console.log('Connected to MongoDB!'); })
+    .catch((reason: any) => { console.log('Connection failed!', reason); });
 
 export default router;

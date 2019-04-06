@@ -13,7 +13,8 @@
         "member-access": false,
         "no-empty": false,
         "jsdoc-format": false,
-        "forin": false
+        "forin": false,
+        "no-shadowed-variable": false
     },
     "rulesDirectory": []
 }

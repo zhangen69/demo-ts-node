@@ -141,7 +141,6 @@ export default class StandardController {
             delete updateModel.$set.audit;
             delete updateModel.$set['audit.updatedDate'];
             updateModel.$currentDate = { 'audit.updatedDate': { $type: 'date' } };
-            console.log(updateModel);
         }
 
         return updateModel;

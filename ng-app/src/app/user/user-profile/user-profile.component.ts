@@ -47,7 +47,6 @@ export class UserProfileComponent implements OnInit {
   }
 
   onSubmit(formData) {
-    console.log(formData);
     this.userService.updateProfile(formData);
   }
 

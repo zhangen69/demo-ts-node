@@ -15,73 +15,95 @@ class Controller {
         return new Promise((resolve, reject) => {
             const user = new User(model);
             // check duplicate username and email
-            User.find({ $or: [ { username: model.username }, { email: model.email } ] }).then((docs) => {
+            User.find({ $or: [{ username: model.username }, { email: model.email }] }).exec((err, docs) => {
+
+                if (err) { throw new Error(err.toString()); }
                 if (docs.length > 0) {
-                    reject({
+                    return reject({
                         status: 400,
                         message: 'Username or Email already existed. Please try again',
                     });
-                } else {
-                    user.save().then((data) => {
-                        const result = {
-                            status: 201,
-                            message: `user created successfully!`,
-                            data,
-                        };
-                        resolve(result);
-                    });
                 }
+
+                user.save((err, data) => {
+
+                    if (err) { throw new Error(err.toString()); }
+                    const result = {
+                        status: 201,
+                        message: `user created successfully!`,
+                        data,
+                    };
+                    return resolve(result);
+                });
             });
         });
     }
 
     login(model: IUserLogin) {
         return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username }).then((user: any) => {
+            User.findOne({ username: model.username }).exec((err, user: any) => {
+
+                if (err) { throw new Error(err.toString()); }
                 if (!user || !bcrypt.compareSync(model.password, user.passwordHash)) {
-                    return reject({
+                    const errorResult = {
                         status: 401,
                         message: 'Username or Password are incorrect. Please try again',
-                    });
+                    };
+
+                    if (user && user.accessFailedCount < 3) {
+                        const isLocked = user.accessFailedCount + 1 === 3;
+                        user.updateOne({ accessFailedCount: user.accessFailedCount + 1, isAccessFailedLocked: isLocked }).exec((err, res: any) => {
+
+                            if (err) { throw new Error(err.toString()); }
+                            return reject(errorResult);
+                        });
+                    } else {
+                        if (user && user.isAccessFailedLocked) {
+                            errorResult.status = 423;
+                            errorResult.message = 'Your account access failed 3 times, please contact admin to unlock the account.';
+                        }
+
+                        return reject(errorResult);
+                    }
+                } else {
+                    const { succeeded, status, message } = this.userLockHandler(user);
+
+                    if (!succeeded) {
+                        return reject({ status, message });
+                    }
+
+                    const token = jwt.sign(
+                        { username: user.username, _id: user._id },
+                        'secret this should be longer',
+                        { expiresIn: '1d' },
+                    );
+
+                    const result = {
+                        status: 200,
+                        message: `logged in!`,
+                        token,
+                        expiresIn: 60 * 60 * 24,
+                    };
+
+                    if (user.accessFailedCount > 0) {
+                        user.updateOne({ accessFailedCount: 0 }).exec((err, res: any) => {
+                            return resolve(result);
+                        });
+                    } else {
+                        return resolve(result);
+                    }
                 }
-
-                if (user.isLocked) {
-                    return reject({
-                        status: 423,
-                        message: 'Account is loced, please contact admin to unlock the account.',
-                    });
-                }
-
-                if (user.isResetPasswordLocked) {
-                    return reject({
-                        status: 423,
-                        message: 'Your account is locked by reset password, please check your mailbox to reset your password.',
-                    });
-                }
-
-                const token = jwt.sign(
-                    { username: user.username, _id: user._id },
-                    'secret this should be longer',
-                    { expiresIn: '1d' },
-                );
-
-                return resolve({
-                    status: 200,
-                    message: `logged in!`,
-                    token,
-                    expiresIn: 60 * 60 * 24,
-                });
             });
         });
     }
 
     logout(model: IUserLogin) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => { });
     }
 
     changePassword(model: IChangePasswordRequest, auth) {
         return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username }).then((user: any) => {
+            User.findOne({ username: model.username }).exec((err, user: any) => {
                 if (user == null) { throw new Error('Not found user'); }
 
                 if (!bcrypt.compareSync(model.password, user.passwordHash)) {
@@ -120,10 +142,10 @@ class Controller {
 
     updateProfile(model: IUser) {
         return new Promise((resolve, reject) => {
-            User.findById(model._id).then((user: any) => {
+            User.findById(model._id).exec((err, user: any) => {
                 if (user === null) { throw new Error('User not found'); }
 
-                user.update(model).then((doc: any) => {
+                user.updateOne(model).exec((err, doc: any) => {
                     return resolve({
                         status: 201,
                         message: 'update profile successfully!',
@@ -135,12 +157,12 @@ class Controller {
     }
 
     emailConfirmed(model: IEmailConfirmRequest) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => { });
     }
 
     forgotPassword(model: IForgotPasswordRequest) {
         return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username, email: model.email }).then((user: any) => {
+            User.findOne({ username: model.username, email: model.email }).exec((err, user: any) => {
                 if (user == null) { return new Error('User not found'); }
 
                 const set = { isResetPasswordLocked: true, resetPasswordToken: uuid() };
@@ -149,7 +171,7 @@ class Controller {
 
                 // send email service
 
-                user.update(set).then((data) => {
+                user.updateOne(set).exec((err, data) => {
                     const result = {
                         status: 200,
                         url,
@@ -164,7 +186,7 @@ class Controller {
 
     verifyResetPasswordToken(model: IVerifyTokenRequest) {
         return new Promise((resolve, reject) => {
-            User.findOne({ resetPasswordToken: model.token }).then((doc: any) => {
+            User.findOne({ resetPasswordToken: model.token }).exec((doc: any) => {
                 if (doc == null) { throw new Error('Token is invalid'); }
 
                 return resolve({
@@ -205,11 +227,8 @@ class Controller {
             }
 
             User.estimatedDocumentCount(conditions).then((count) => {
-                User.find(conditions, selections, options, (err, docs: any) => {
-                    if (err) {
-                        reject(err);
-                    }
-                }).then((data: any) => {
+                User.find(conditions, selections, options).exec((err, data: any) => {
+                    if (err) { reject(err); }
                     const result = {
                         status: 200,
                         data: mapColletionToUserDTO(data),
@@ -230,14 +249,15 @@ class Controller {
 
     update(model: IUser, auth) {
         return new Promise((resolve, reject) => {
-            User.findById(model._id, (err, doc) => {
-                if (err) {
-                    reject(err);
-                }
-            }).then((user) => {
+            User.findById(model._id).exec((err, user) => {
+
+                if (err) { throw new Error(err.toString()); }
                 if (user == null) { throw new Error(`user not found!`); }
 
-                user.update(this._getUpdateConditions(model, auth)).then((doc) => {
+                user.updateOne(this._getUpdateConditions(model, auth)).exec((err, doc) => {
+
+                    if (err) { throw new Error(err.toString()); }
+
                     const result = {
                         status: 201,
                         message: `user updated successfully!`,
@@ -251,10 +271,11 @@ class Controller {
 
     lock(model: IUser, auth) {
         return new Promise((resolve, reject) => {
-            User.findById(model._id).then((doc) => {
+            User.findById(model._id).exec((err, doc) => {
+                if (err) { throw new Error(err.toString()); }
                 if (doc == null) { throw new Error(`user not found!`); }
 
-                doc.update({ isLocked: true }).then((res) => {
+                doc.updateOne({ isLocked: true }).then((res) => {
                     const result = {
                         status: 201,
                         message: `user locked successfully!`,
@@ -269,10 +290,21 @@ class Controller {
 
     unlock(model: IUser, auth) {
         return new Promise((resolve, reject) => {
-            User.findById(model._id).then((doc) => {
-                if (doc == null) { throw new Error(`user not found!`); }
+            User.findById(model._id).exec((err, user: any) => {
 
-                doc.update({ isLocked: false }).then((res) => {
+                if (err) { throw new Error(err.toString()); }
+                if (user == null) { throw new Error(`user not found!`); }
+
+                const set: any = { isLocked: false };
+
+                if (user.isAccessFailedLocked) {
+                    set.isAccessFailedLocked = false;
+                    set.accessFailedCount = 0;
+                }
+
+                user.updateOne(set).exec((err, res) => {
+
+                    if (err) { throw new Error(err.toString()); }
                     const result = {
                         status: 201,
                         message: `user unlocked successfully!`,
@@ -287,7 +319,9 @@ class Controller {
 
     resetPassword(model: IResetPasswordRequest) {
         return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username, resetPasswordToken: model.token }).then((user: any) => {
+            User.findOne({ username: model.username, resetPasswordToken: model.token }).exec((err, user: any) => {
+
+                if (err) { throw new Error(err.toString()); }
                 if (user == null) { throw new Error('Failed to reset password. Username is invalid or token is expired.'); }
 
                 const newPasswordHash = bcrypt.hashSync(model.newPassword, 10);
@@ -297,7 +331,8 @@ class Controller {
                     isResetPasswordLocked: false,
                 };
 
-                user.update(set).then((res: any) => {
+                user.update(set).exec((err, res: any) => {
+                    if (err) { throw new Error(err.toString()); }
                     return resolve({
                         status: 201,
                         message: 'your password was changed successfully!',
@@ -305,6 +340,29 @@ class Controller {
                 });
             });
         });
+    }
+
+    private userLockHandler(user): { succeeded: boolean, status: number, message: string } {
+        const result: any = {
+            succeeded: true,
+            status: 200,
+            message: '',
+        };
+
+        if (user.isLocked || user.isResetPasswordLocked || user.isAccessFailedLocked) {
+            result.succeeded = false;
+            result.status = 423;
+
+            if (user.isLocked) {
+                result.message = 'Account is loced, please contact admin to unlock the account.';
+            } else if (user.isResetPasswordLocked) {
+                result.message = 'Your account is locked by reset password, please check your mailbox to reset your password.';
+            } else if (user.isAccessFailedLocked) {
+                result.message = 'Your account access failed 3 times, please contact admin to unlock the account.';
+            }
+        }
+
+        return result;
     }
 
     private _getUpdateConditions(model, auth) {
@@ -319,7 +377,6 @@ class Controller {
             delete updateModel.$set.audit;
             delete updateModel.$set['audit.updatedDate'];
             updateModel.$currentDate = { 'audit.updatedDate': { $type: 'date' } };
-            console.log(updateModel);
         }
 
         return updateModel;

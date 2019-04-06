@@ -57,7 +57,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   lockOrUnlockUser(item) {
-    if (item.isLocked) {
+    if (item.isLocked || item.isAccessFailedLocked) {
       this.userService.unlock(item);
     } else {
       this.userService.lock(item);
