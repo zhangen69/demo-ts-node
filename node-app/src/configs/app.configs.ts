@@ -1,5 +1,5 @@
 const mongoose = {
-    connection: 'mongodb+srv://jacob:dvyohzFHpCIK85MY@node-app-yfxfw.gcp.mongodb.net/demo_db?retryWrites=true',
+    connection: 'mongodb+srv://jacob:RRgqCzxv5stwDPvZ@node-app-yfxfw.gcp.mongodb.net/demo_db?retryWrites=true',
 };
 
 const cloudinary = {
