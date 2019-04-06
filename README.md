@@ -133,3 +133,4 @@
 - [ ] Configuration Settings (Email Settings, Access Failed Settings, ...)
 - [ ] Auto Generate Document Code for Collections, which is [Documentable]
 - [ ] Activity Logs (Application Level)
+  - [x] HTTP Logs (XHR Logs)
