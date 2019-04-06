@@ -3,7 +3,7 @@
 # TS-NODE App
 > It's a application with MEAN Stack that means MongoDB, ExpressJs, Angular, and NodeJs. In case, it just a demostration.
 
-# Used Frameworks/Library
+# Used Frameworks/Library (NodeJS)
 > dependencies
 - body-parser v1.18.3
 - cloudinary v1.13.2
@@ -12,16 +12,60 @@
 - multer v1.4.1
 - multer-storage-cloudinary v2.2.1
 - promise v8.0.3
+- bcrypt v3.0.5
+- jsonwebtoken v8.5.1
 > devDependencies
 - @types/express v4.16.1
 - @types/mongoose v5.3.23
 - @types/multer v1.3.7
+- @types/bcrypt v3.0.0
+- @types/jsonwebtoken v8.3.2
 - nodemon v1.18.10
 - tslint v5.14.0
 - typescript v3.3.4000
 
+# Used Frameworks/Library (Angular)
+> dependencies
+- @angular/animations v7.2.0
+- @angular/cdk v7.3.3
+- @angular/common v7.2.0
+- @angular/compiler v7.2.0
+- @angular/core v7.2.0
+- @angular/flex-layout v7.0.0-beta.23
+- @angular/forms v7.2.0
+- @angular/material v7.3.3
+- @angular/platform-browser v7.2.0
+- @angular/platform-browser-dynamic v7.2.0
+- @angular/router v7.2.0
+- core-js v2.5.4
+- hammerjs v2.0.8
+- ng2-file-upload v1.3.0
+- ngx-toastr v10.0.2
+- rxjs v6.3.3
+- tslib v1.9.0
+- zone.js v0.8.26
+> devDependencies
+- @angular-devkit/build-angular v0.12.0
+- @angular/cli v7.2.3
+- @angular/compiler-cli v7.2.0
+- @angular/language-service v7.2.0
+- @types/node v8.9.4
+- @types/jasmine v2.8.8
+- @types/jasminewd2 v2.0.3
+- codelyzer v4.5.0
+- jasmine-core v2.99.1
+- jasmine-spec-reporter v4.2.1
+- karma v3.1.1
+- karma-chrome-launcher v2.2.0
+- karma-coverage-istanbul-reporter v2.0.1
+- karma-jasmine v1.1.2
+- karma-jasmine-html-reporter v0.2.2
+- protractor v5.4.0
+- ts-node v7.0.0
+- tslint v5.11.0
+- typescript v3.2.2
+
 # Pending & Ready to Use
-- angular-jwt
 - jsreport
 - express-mailer
 
