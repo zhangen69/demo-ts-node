@@ -27,6 +27,12 @@ export class UserService extends StandardService {
     this.dialogHandler(user, message, url);
   }
 
+  resetPassword(user): void {
+    const message = `Do you want to reset password for account '${user.username}'`;
+    const url = this.apiUrl + '/forgotPassword';
+    this.dialogHandler(user, message, url);
+  }
+
   changePassword(model) {
     return this.http.post(this.apiUrl + '/changePassword', model).subscribe((res: any) => {
       this.toastr.success(res.message);

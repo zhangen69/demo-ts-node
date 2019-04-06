@@ -56,12 +56,16 @@ export class UserListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  lockOrUnlockUser(item) {
+  onLockOrUnlockUser(item) {
     if (item.isLocked || item.isAccessFailedLocked) {
       this.userService.unlock(item);
     } else {
       this.userService.lock(item);
     }
+  }
+
+  onResetPassword(item) {
+    this.userService.resetPassword(item);
   }
 
   sortData(sort: Sort) {

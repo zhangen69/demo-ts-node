@@ -39,10 +39,11 @@
     <td mat-cell *matCellDef="let item">
       <div class="btn-group" *ngIf="isAuth">
           <button mat-stroked-button [routerLink]="['/user/edit', item._id]" routerLinkActive="router-link-active"><mat-icon>edit</mat-icon> Edit</button>
-          <button mat-stroked-button color="warn" (click)="lockOrUnlockUser(item)">
-            <span *ngIf="!(item.isLocked || item.isAccessFailedLocked)"><mat-icon>lock</mat-icon> Lock</span>
-            <span *ngIf="item.isLocked || item.isAccessFailedLocked"><mat-icon>lock_open</mat-icon> Unlock</span>
+          <button mat-stroked-button color="warn" (click)="onLockOrUnlockUser(item)">
+            <span *ngIf="!(item.isLocked || item.isAccessFailedLocked || item.isResetPasswordLocked)"><mat-icon>lock</mat-icon> Lock</span>
+            <span *ngIf="item.isLocked || item.isAccessFailedLocked || item.isResetPasswordLocked"><mat-icon>lock_open</mat-icon> Unlock</span>
           </button>
+          <button mat-stroked-button (click)="onResetPassword(item)"><mat-icon>report</mat-icon> Reset Password</button>
       </div>
     </td>
   </ng-container>
