@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Promise from 'promise';
 import { v4 as uuid } from 'uuid';
 import { mapColletionToUserDTO, mapDocToUserDTO } from '../DTOs/user.dto';
 import IMongooseQueryModel from '../interfaces/mongoose/mongooseQueryModel.interface';
@@ -10,88 +9,57 @@ import User from '../models/user.model';
 
 class Controller {
     // user
-    register(model: IUserRegister) {
-        model.passwordHash = bcrypt.hashSync(model.password, 10);
-        return new Promise((resolve, reject) => {
-            const user = new User(model);
-            // check duplicate username and email
-            User.find({ $or: [{ username: model.username }, { email: model.email }] }).exec((err, docs) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (docs.length > 0) {
-                    return reject({
-                        status: 400,
-                        message: 'Username or Email already existed. Please try again',
-                    });
-                }
+    async register(model: IUserRegister) {
+        // check duplicate username and email
+        const users = await this.findUsers({ $or: [{ username: model.username }, { email: model.email }] });
 
-                user.save((err, data) => {
-                    if (err) { return this.errorHandler(reject, err.toString()); }
-                    const result = {
-                        status: 201,
-                        message: `user created successfully!`,
-                        data,
-                    };
-                    return resolve(result);
-                });
-            });
-        });
+        if (users.length > 0) {
+            return { status: 400, message: 'Username or Email already existed. Please try again' };
+        }
+
+        return await this.createUser(model, 'user created successfully!');
     }
 
-    login(model: IUserLogin) {
-        return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username }).exec((err, user: any) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (!user || !bcrypt.compareSync(model.password, user.passwordHash)) {
-                    const errorResult = {
-                        status: 401,
-                        message: 'Username or Password are incorrect. Please try again',
-                    };
+    async login(model: IUserLogin) {
+        const user = await this.findUser({ username: model.username });
+        const errorRes = { status: 401, message: 'Username or Password are incorrect. Please try again' };
 
-                    if (user && user.accessFailedCount < 3) {
-                        const isLocked = user.accessFailedCount + 1 === 3;
-                        user.updateOne({ accessFailedCount: user.accessFailedCount + 1, isAccessFailedLocked: isLocked }).exec((err, res: any) => {
+        if (!user) {
+            return errorRes;
+        }
 
-                            if (err) { return this.errorHandler(reject, err.toString()); }
-                            return reject(errorResult);
-                        });
-                    } else {
-                        if (user && user.isAccessFailedLocked) {
-                            errorResult.status = 423;
-                            errorResult.message = 'Your account access failed 3 times, please contact admin to unlock the account.';
-                        }
+        if (!bcrypt.compareSync(model.password, user.passwordHash)) {
+            if (user.accessFailedCount < 3) {
+                const accessFailedCount = user.accessFailedCount + 1;
+                const isAccessFailedLocked = user.accessFailedCount + 1 === 3;
+                return await this.updateUser(user, { accessFailedCount, isAccessFailedLocked });
+            }
 
-                        return reject(errorResult);
-                    }
-                } else {
-                    const { succeeded, status, message } = this.userLockHandler(user);
+            if (user.isAccessFailedLocked) {
+                return { status: 423, message: 'Your account access failed 3 times, please contact admin to unlock the account' };
+            }
 
-                    if (!succeeded) {
-                        return reject({ status, message });
-                    }
+            return errorRes;
+        }
 
-                    const token = jwt.sign(
-                        { username: user.username, _id: user._id },
-                        'secret this should be longer',
-                        { expiresIn: '1d' },
-                    );
+        const { succeeded, status, message } = this.userLockHandler(user);
 
-                    const result = {
-                        status: 200,
-                        message: `logged in!`,
-                        token,
-                        expiresIn: 60 * 60 * 24,
-                    };
+        if (!succeeded) {
+            return ({ status, message });
+        }
 
-                    if (user.accessFailedCount > 0) {
-                        user.updateOne({ accessFailedCount: 0 }).exec((err, res: any) => {
-                            return resolve(result);
-                        });
-                    } else {
-                        return resolve(result);
-                    }
-                }
-            });
-        });
+        const result = {
+            status: 200,
+            message: `logged in!`,
+            token: jwt.sign({ username: user.username, _id: user._id }, 'secret this should be longer', { expiresIn: '1d' }),
+            expiresIn: 60 * 60 * 24,
+        };
+
+        if (user.accessFailedCount > 0) {
+            return await this.updateUser(user, { accessFailedCount: 0 });
+        }
+
+        return (result);
     }
 
     logout(model: IUserLogin) {
@@ -235,10 +203,6 @@ class Controller {
         });
     }
 
-    create(model: IUserRegister) {
-        return this.register(model);
-    }
-
     update(model: IUser, auth) {
         return new Promise((resolve, reject) => {
             User.findById(model._id).exec((err, user) => {
@@ -334,6 +298,51 @@ class Controller {
             });
         });
     }
+    private findUsers(conditions) {
+        return new Promise<any>((resolve, reject) => {
+            User.find(conditions).exec((err, docs) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(docs);
+                }
+            });
+        });
+    }
+
+    private findUser(conditions) {
+        return new Promise<any>((resolve, reject) => {
+            User.findOne(conditions).exec((err, doc) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(doc);
+                }
+            });
+        });
+    }
+
+    private createUser(model, message?) {
+        return new Promise<any>((resolve, reject) => {
+            model.passwordHash = bcrypt.hashSync(model.password, 10);
+            const user = new User(model);
+            user.save().then((data) => {
+                resolve({ status: 201, message });
+            }).catch((reason: any) => {
+                reject(new Error(reason.toString()));
+            });
+        });
+    }
+
+    private updateUser(user, model, message?) {
+        return new Promise<any>((resolve, reject) => {
+            user.updateOne(model).then((doc: any) => {
+                resolve({ status: 201, message });
+            }).catch((reason: any) => {
+                reject(new Error(reason.toString()));
+            });
+        });
+    }
 
     private userLockHandler(user): { succeeded: boolean, status: number, message: string } {
         const result: any = {
@@ -378,6 +387,7 @@ class Controller {
     private errorHandler(reject, message) {
         return reject({ status: 500, message });
     }
+
 }
 
 const UserController = new Controller();
