@@ -62,245 +62,106 @@ class Controller {
         return (result);
     }
 
-    logout(model: IUserLogin) {
-        return new Promise((resolve, reject) => { });
+    async changePassword(model: IChangePasswordRequest, auth) {
+        const user = await this.findUser({ username: model.username });
+
+        if (!bcrypt.compareSync(model.password, user.passwordHash)) {
+            return { status: 403, message: 'Password are invalid! Please try again.' };
+        }
+
+        user.passwordHash = bcrypt.hashSync(model.newPassword, 10);
+
+        return await this.saveUser(user, `user password changed successfully!`);
     }
 
-    changePassword(model: IChangePasswordRequest, auth) {
-        return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username }).exec((err, user: any) => {
-                if (user == null) { return this.errorHandler(reject, 'Not found user'); }
-                if (!bcrypt.compareSync(model.password, user.passwordHash)) {
-                    return reject({
-                        status: 403,
-                        message: 'Password are invalid! Please try again.',
-                    });
-                }
-
-                user.passwordHash = bcrypt.hashSync(model.newPassword, 10);
-
-                user.save().then((data) => {
-                    const result = {
-                        status: 201,
-                        message: `user password changed successfully!`,
-                        data,
-                    };
-                    resolve(result);
-                });
-            });
-        });
+    async fetchProfile(id: string) {
+        const user = await this.findUserById(id);
+        return { status: 200, data: mapDocToUserDTO(user) };
     }
 
-    fetchProfile(id: string) {
-        return new Promise((resolve, reject) => {
-            User.findById(id).then((user: any) => {
-                if (user == null) { return this.errorHandler(reject, 'User not found'); }
-
-                return resolve({
-                    status: 200,
-                    data: mapDocToUserDTO(user),
-                });
-            });
-        });
-    }
-
-    updateProfile(model: IUser) {
-        return new Promise((resolve, reject) => {
-            User.findById(model._id).exec((err, user: any) => {
-                if (user === null) { return this.errorHandler(reject, 'User not found'); }
-
-                user.updateOne(model).exec((err, doc: any) => {
-                    return resolve({
-                        status: 201,
-                        message: 'update profile successfully!',
-                    });
-                });
-            });
-
-        });
+    async updateProfile(model: IUser) {
+        const user = await this.findUserById(model._id);
+        return await this.updateUser(user, model, 'update profile successfully!');
     }
 
     emailConfirmed(model: IEmailConfirmRequest) {
         return new Promise((resolve, reject) => { });
     }
 
-    forgotPassword(model: IForgotPasswordRequest) {
-        return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username, email: model.email }).exec((err, user: any) => {
-                if (user == null) { return this.errorHandler(reject, 'User not found'); }
-
-                const set = { isResetPasswordLocked: true, resetPasswordToken: uuid() };
-                const url = `http://localhost:4200/auth/resetPassword/${set.resetPasswordToken}`;
-
-                // send email service
-
-                user.updateOne(set).exec((err, data) => {
-                    const result = {
-                        status: 200,
-                        url,
-                        message: `sent reset password email to ${model.email}, account will temperarily locked until user changed password.`,
-                    };
-
-                    return resolve(result);
-                });
-            });
-        });
+    async forgotPassword(model: IForgotPasswordRequest) {
+        const user = await this.findUser({ username: model.username, email: model.email });
+        const set = { isResetPasswordLocked: true, resetPasswordToken: uuid() };
+        const url = `http://localhost:4200/auth/resetPassword/${set.resetPasswordToken}`;
+        return await this.updateUser(user, set, `sent reset password email to ${model.email}, account will temperarily locked until user changed password.`);
     }
 
-    verifyResetPasswordToken(model: IVerifyTokenRequest) {
-        return new Promise((resolve, reject) => {
-            User.findOne({ resetPasswordToken: model.token }).exec((err, doc: any) => {
-                if (doc == null) { return this.errorHandler(reject, 'Token is invalid'); }
-
-                return resolve({
-                    status: 200,
-                    verified: true,
-                });
-            });
-        });
+    async verifyResetPasswordToken(model: IVerifyTokenRequest) {
+        const user = await this.findUser({ resetPasswordToken: model.token });
+        return { status: 200, verified: true };
     }
 
     // admin
-    fetch(id: string) {
-        return new Promise((resolve, reject) => {
-            User.findById(id).exec((err, doc: any) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (doc == null) { return this.errorHandler(reject, 'Product not found!'); }
-
-                const result = {
-                    status: 200,
-                    data: mapDocToUserDTO(doc),
-                };
-
-                resolve(result);
-            });
-        });
+    async fetch(id: string) {
+        const user = await this.findUserById(id);
+        return { status: 200, data: mapDocToUserDTO(user) };
     }
 
-    fetchAll(queryModel: QueryModel, auth?) {
-        return new Promise((resolve, reject) => {
-            const { conditions, selections, options } = new QueryModel(queryModel).getQuery();
-
-            if (auth.isAuth) {
-                // $ne as NOT EQUAL, username not equal to current user
-                conditions.username = { $ne: auth.user.username };
-            }
-
-            User.estimatedDocumentCount(conditions).then((count) => {
-                User.find(conditions, selections, options).exec((err, data: any) => {
-                    if (err) { reject(err); }
-                    const result = {
-                        status: 200,
-                        data: mapColletionToUserDTO(data),
-                        totalItems: count,
-                        currentPage: queryModel.currentPage,
-                        totalPages: Math.ceil(count / queryModel.pageSize),
-                    };
-
-                    resolve(result);
-                });
-            });
-        });
+    async fetchAll(queryModel: QueryModel, auth?) {
+        const { conditions, selections, options } = new QueryModel(queryModel).getQuery();
+        if (auth.isAuth) {
+            // $ne as NOT EQUAL, username not equal to current user
+            conditions.username = { $ne: auth.user.username };
+        }
+        const count = await this.estimatedDocumentCount(conditions);
+        const users = await this.findUsers(conditions, selections, options);
+        return {
+            status: 200,
+            data: mapColletionToUserDTO(users),
+            totalItems: count,
+            currentPage: queryModel.currentPage,
+            totalPages: Math.ceil(count / queryModel.pageSize),
+        };
     }
 
-    update(model: IUser, auth) {
-        return new Promise((resolve, reject) => {
-            User.findById(model._id).exec((err, user) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (user == null) { return this.errorHandler(reject, `user not found!`); }
-
-                user.updateOne(this._getUpdateConditions(model, auth)).exec((err, doc) => {
-                    if (err) { return this.errorHandler(reject, err.toString()); }
-
-                    const result = {
-                        status: 201,
-                        message: `user updated successfully!`,
-                    };
-
-                    resolve(result);
-                });
-            });
-        });
+    async update(model: IUser, auth) {
+        const user = await this.findUserById(model._id);
+        return await this.updateUser(user, this._getUpdateConditions(model, auth), `user updated successfully!`);
     }
 
-    lock(model: IUser, auth) {
-        return new Promise((resolve, reject) => {
-            User.findById(model._id).exec((err, doc) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (doc == null) { return this.errorHandler(reject, `user not found!`); }
-
-                doc.updateOne({ isLocked: true }).then((res) => {
-                    const result = {
-                        status: 201,
-                        message: `user locked successfully!`,
-                    };
-
-                    resolve(result);
-                });
-
-            });
-        });
+    async lock(model: IUser, auth) {
+        const user = await this.findUserById(model._id);
+        return await this.updateUser(user, { isLocked: true }, `user locked successfully!`);
     }
 
-    unlock(model: IUser, auth) {
-        return new Promise((resolve, reject) => {
-            User.findById(model._id).exec((err, user: any) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (user == null) { return this.errorHandler(reject, `user not found!`); }
+    async unlock(model: IUser, auth) {
+        const user = await this.findUserById(model._id);
+        const set: any = { isLocked: false };
+        if (user.isAccessFailedLocked) {
+            set.isAccessFailedLocked = false;
+            set.accessFailedCount = 0;
+        }
 
-                const set: any = { isLocked: false };
+        if (user.isResetPasswordLocked) {
+            return { status: 500, message: 'failed to unlock account, because it is locked by reset password. either user changed password or retry send a new reset password email to unlock the account.' };
+        }
 
-                if (user.isAccessFailedLocked) {
-                    set.isAccessFailedLocked = false;
-                    set.accessFailedCount = 0;
-                }
-
-                if (user.isResetPasswordLocked) {
-                    const message = 'failed to unlock account, because it is locked by reset password. either user changed password or retry send a new reset password email to unlock the account.';
-                    return reject({ status: 500, message });
-                }
-
-                user.updateOne(set).exec((err, res) => {
-
-                    if (err) { return this.errorHandler(reject, err.toString()); }
-                    const result = {
-                        status: 201,
-                        message: `user unlocked successfully!`,
-                    };
-
-                    return resolve(result);
-                });
-
-            });
-        });
+        return await this.updateUser(user, set, `user locked successfully!`);
     }
 
-    resetPassword(model: IResetPasswordRequest) {
-        return new Promise((resolve, reject) => {
-            User.findOne({ username: model.username, resetPasswordToken: model.token }).exec((err, user: any) => {
-                if (err) { return this.errorHandler(reject, err.toString()); }
-                if (user == null) { return this.errorHandler(reject, 'Failed to reset password. Username is invalid or token is expired.'); }
-
-                const newPasswordHash = bcrypt.hashSync(model.newPassword, 10);
-                const set = {
-                    passwordHash: newPasswordHash,
-                    resetPasswordToken: null,
-                    isResetPasswordLocked: false,
-                };
-
-                user.update(set).exec((err, res: any) => {
-                    if (err) { return this.errorHandler(reject, err.toString()); }
-                    return resolve({
-                        status: 201,
-                        message: 'your password was changed successfully!',
-                    });
-                });
-            });
-        });
+    async resetPassword(model: IResetPasswordRequest) {
+        const user = await this.findUser({ username: model.username, resetPasswordToken: model.token });
+        const newPasswordHash = bcrypt.hashSync(model.newPassword, 10);
+        const set = {
+            passwordHash: newPasswordHash,
+            resetPasswordToken: null,
+            isResetPasswordLocked: false,
+        };
+        return await this.updateUser(user, set, 'your password was changed successfully!');
     }
-    private findUsers(conditions) {
+
+    private findUsers(conditions, selections?, options?) {
         return new Promise<any>((resolve, reject) => {
-            User.find(conditions).exec((err, docs) => {
+            User.find(conditions, selections, options).exec((err, docs) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -322,6 +183,10 @@ class Controller {
         });
     }
 
+    private findUserById(id) {
+        return this.findUser({ _id: id });
+    }
+
     private createUser(model, message?) {
         return new Promise<any>((resolve, reject) => {
             model.passwordHash = bcrypt.hashSync(model.password, 10);
@@ -334,10 +199,30 @@ class Controller {
         });
     }
 
-    private updateUser(user, model, message?) {
+    private updateUser(user, model?, message?) {
         return new Promise<any>((resolve, reject) => {
             user.updateOne(model).then((doc: any) => {
                 resolve({ status: 201, message });
+            }).catch((reason: any) => {
+                reject(new Error(reason.toString()));
+            });
+        });
+    }
+
+    private saveUser(user, message?) {
+        return new Promise<any>((resolve, reject) => {
+            user.save().then((doc: any) => {
+                resolve({ status: 201, message });
+            }).catch((reason: any) => {
+                reject(new Error(reason.toString()));
+            });
+        });
+    }
+
+    private estimatedDocumentCount(conditions) {
+        return new Promise<any>((resolve, reject) => {
+            User.estimatedDocumentCount(conditions).then((count) => {
+                resolve(count);
             }).catch((reason: any) => {
                 reject(new Error(reason.toString()));
             });

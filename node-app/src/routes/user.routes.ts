@@ -27,12 +27,6 @@ router.post('/register', (req, res) => {
     }).catch((result: any) => {
         res.status(result.status).json(result);
     });
-
-    // UserController.register(req.body).then((result: any) => {
-    //     res.status(result.status).json(result);
-    // }).catch((result: any) => {
-    //     res.status(result.status).json(result);
-    // });
 });
 
 router.post('/login', (req, res) => {
@@ -114,14 +108,11 @@ router.get('/:id', checkAuth, (req, res) => {
 });
 
 router.post('/', checkAuth, (req, res) => {
-    const result = UserController.register(req.body) as any;
-    res.status(result.status).json(result);
-
-    // UserController.create(req.body).then((result: any) => {
-    //     res.status(result.status).json(result);
-    // }).catch((result: any) => {
-    //     res.status(result.status).json(result);
-    // });
+    UserController.register(req.body).then((result: any) => {
+        res.status(result.status).json(result);
+    }).catch((result: any) => {
+        res.status(result.status).json(result);
+    });
 });
 
 router.put('/', checkAuth, (req, res) => {
