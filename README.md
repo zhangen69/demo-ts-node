@@ -119,10 +119,11 @@
   - [x] Registration
   - [x] CRUD
   - [x] Forgot Password & Reset Password
-  - [ ] Reset Password (by admin)
+  - [x] Reset Password (by admin)
   - [x] Access Failed Lock
   - [x] Update Profile
   - [x] Change Password
+  - [ ] Search & Filter Users
 - [ ] Product (or any other collection/module)
   - [x] Standard CRUD
   - [x] Upload Images
