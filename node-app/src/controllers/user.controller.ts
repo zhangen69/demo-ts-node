@@ -22,6 +22,11 @@ class Controller {
 
     async login(model: IUserLogin) {
         const user = await this.findUser({ username: model.username });
+
+        if (user == null) {
+            return { status: 500, message: 'User not found.' };
+        }
+
         const errorRes = { status: 401, message: 'Username or Password are incorrect. Please try again' };
 
         if (!user) {
@@ -29,14 +34,14 @@ class Controller {
         }
 
         if (!bcrypt.compareSync(model.password, user.passwordHash)) {
+            if (user.isAccessFailedLocked) {
+                return { status: 423, message: 'Your account access failed 3 times, please contact admin to unlock the account' };
+            }
+
             if (user.accessFailedCount < 3) {
                 const accessFailedCount = user.accessFailedCount + 1;
                 const isAccessFailedLocked = user.accessFailedCount + 1 === 3;
-                return await this.updateUser(user, { accessFailedCount, isAccessFailedLocked });
-            }
-
-            if (user.isAccessFailedLocked) {
-                return { status: 423, message: 'Your account access failed 3 times, please contact admin to unlock the account' };
+                await this.updateUser(user, { accessFailedCount, isAccessFailedLocked });
             }
 
             return errorRes;
@@ -56,7 +61,7 @@ class Controller {
         };
 
         if (user.accessFailedCount > 0) {
-            return await this.updateUser(user, { accessFailedCount: 0 });
+            await this.updateUser(user, { accessFailedCount: 0 });
         }
 
         return (result);
@@ -64,6 +69,10 @@ class Controller {
 
     async changePassword(model: IChangePasswordRequest, auth) {
         const user = await this.findUser({ username: model.username });
+
+        if (user == null) {
+            return { status: 500, message: 'User not found.' };
+        }
 
         if (!bcrypt.compareSync(model.password, user.passwordHash)) {
             return { status: 403, message: 'Password are invalid! Please try again.' };
@@ -80,16 +89,16 @@ class Controller {
     }
 
     async updateProfile(model: IUser) {
-        const user = await this.findUserById(model._id);
-        return await this.updateUser(user, model, 'update profile successfully!');
-    }
-
-    emailConfirmed(model: IEmailConfirmRequest) {
-        return new Promise((resolve, reject) => { });
+        return await this.findUserByIdAndUpdate(model._id, model, 'update profile successfully!');
     }
 
     async forgotPassword(model: IForgotPasswordRequest) {
         const user = await this.findUser({ username: model.username, email: model.email });
+
+        if (user == null) {
+            return { status: 500, message: 'User not found.' };
+        }
+
         const set = { isResetPasswordLocked: true, resetPasswordToken: uuid() };
         const url = `http://localhost:4200/auth/resetPassword/${set.resetPasswordToken}`;
         return await this.updateUser(user, set, `sent reset password email to ${model.email}, account will temperarily locked until user changed password.`);
@@ -97,6 +106,11 @@ class Controller {
 
     async verifyResetPasswordToken(model: IVerifyTokenRequest) {
         const user = await this.findUser({ resetPasswordToken: model.token });
+
+        if (user == null) {
+            return { status: 500, message: 'Token is invalid.' };
+        }
+
         return { status: 200, verified: true };
     }
 
@@ -124,17 +138,20 @@ class Controller {
     }
 
     async update(model: IUser, auth) {
-        const user = await this.findUserById(model._id);
-        return await this.updateUser(user, this._getUpdateConditions(model, auth), `user updated successfully!`);
+        return await this.findUserByIdAndUpdate(model._id, this._getUpdateConditions(model, auth), 'user updated successfully!');
     }
 
     async lock(model: IUser, auth) {
-        const user = await this.findUserById(model._id);
-        return await this.updateUser(user, { isLocked: true }, `user locked successfully!`);
+        return await this.findUserByIdAndUpdate(model._id, { isLocked: true }, 'user locked successfully!');
     }
 
     async unlock(model: IUser, auth) {
         const user = await this.findUserById(model._id);
+
+        if (user == null) {
+            return { status: 500, message: 'User not found.' };
+        }
+
         const set: any = { isLocked: false };
         if (user.isAccessFailedLocked) {
             set.isAccessFailedLocked = false;
@@ -150,6 +167,11 @@ class Controller {
 
     async resetPassword(model: IResetPasswordRequest) {
         const user = await this.findUser({ username: model.username, resetPasswordToken: model.token });
+
+        if (user == null) {
+            return { status: 500, message: 'Failed to reset password. Username or Token is invalid.' };
+        }
+
         const newPasswordHash = bcrypt.hashSync(model.newPassword, 10);
         const set = {
             passwordHash: newPasswordHash,
@@ -161,25 +183,13 @@ class Controller {
 
     private findUsers(conditions, selections?, options?) {
         return new Promise<any>((resolve, reject) => {
-            User.find(conditions, selections, options).exec((err, docs) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(docs);
-                }
-            });
+            User.find(conditions, selections, options, (err, docs) => this.resHandler({ resolve, reject }, { err, res: docs }));
         });
     }
 
     private findUser(conditions) {
         return new Promise<any>((resolve, reject) => {
-            User.findOne(conditions).exec((err, doc) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(doc);
-                }
-            });
+            User.findOne(conditions, (err, doc) => this.resHandler({ resolve, reject }, { err, res: doc }));
         });
     }
 
@@ -187,45 +197,34 @@ class Controller {
         return this.findUser({ _id: id });
     }
 
+    private async findUserByIdAndUpdate(id, model, message?) {
+        const user = await this.findUserById(id);
+        return await this.updateUser(user, model, message);
+    }
+
     private createUser(model, message?) {
         return new Promise<any>((resolve, reject) => {
             model.passwordHash = bcrypt.hashSync(model.password, 10);
             const user = new User(model);
-            user.save().then((data) => {
-                resolve({ status: 201, message });
-            }).catch((reason: any) => {
-                reject(new Error(reason.toString()));
-            });
+            user.save((err, doc) => this.resHandler({ resolve, reject }, { err, res: doc }, { status: 201, message }));
         });
     }
 
     private updateUser(user, model?, message?) {
         return new Promise<any>((resolve, reject) => {
-            user.updateOne(model).then((doc: any) => {
-                resolve({ status: 201, message });
-            }).catch((reason: any) => {
-                reject(new Error(reason.toString()));
-            });
+            user.updateOne(model, (err, doc) => this.resHandler({ resolve, reject }, { err, res: doc }, { status: 200, message }));
         });
     }
 
     private saveUser(user, message?) {
         return new Promise<any>((resolve, reject) => {
-            user.save().then((doc: any) => {
-                resolve({ status: 201, message });
-            }).catch((reason: any) => {
-                reject(new Error(reason.toString()));
-            });
+            user.save((err, doc) => this.resHandler({ resolve, reject }, { err, res: doc }, { status: 200, message }));
         });
     }
 
     private estimatedDocumentCount(conditions) {
         return new Promise<any>((resolve, reject) => {
-            User.estimatedDocumentCount(conditions).then((count) => {
-                resolve(count);
-            }).catch((reason: any) => {
-                reject(new Error(reason.toString()));
-            });
+            User.estimatedDocumentCount(conditions, (err, count) => this.resHandler({ resolve, reject }, { err, res: count }));
         });
     }
 
@@ -269,10 +268,17 @@ class Controller {
         return updateModel;
     }
 
-    private errorHandler(reject, message) {
-        return reject({ status: 500, message });
-    }
+    private resHandler({ resolve, reject }, { err, res }, resMessage?) {
+        if (err) {
+            return reject(err);
+        } else {
+            if (resMessage) {
+                return resolve(resMessage);
+            }
 
+            return resolve(res);
+        }
+    }
 }
 
 const UserController = new Controller();
