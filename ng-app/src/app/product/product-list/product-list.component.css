@@ -27,3 +27,7 @@ th.mat-sort-header-sorted {
 .mat-paginator {
   margin-top: 1rem;
 }
+
+.mat-form-field {
+  width: 100%;
+}

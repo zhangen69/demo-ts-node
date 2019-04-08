@@ -66,7 +66,9 @@ export default class StandardController {
         return new Promise((resolve, reject) => {
             const query = new QueryModel(queryModel).getQuery();
 
-            this.model.estimatedDocumentCount(query.conditions).then((count) => {
+            const tempConditions = { name: /e/i };
+
+            this.model.countDocuments(query.conditions).then((count) => {
                 this.model.find(query.conditions, query.selections, query.options).then((data) => {
                     const result = {
                         status: 200,

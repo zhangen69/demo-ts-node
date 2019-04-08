@@ -2,7 +2,11 @@
   <a [routerLink]="['/product/add']" routerLinkActive="router-link-active" mat-raised-button><mat-icon>insert_drive_file</mat-icon> New Product</a>
 </div>
 
-<table mat-table [dataSource]="products" matSort class="mat-elevation-z2 standard-mat-table" (matSortChange)="sortData($event)">
+<mat-form-field>
+  <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+</mat-form-field>
+
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2 standard-mat-table" (matSortChange)="sortData($event)">
   <!-- Name Column -->
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>

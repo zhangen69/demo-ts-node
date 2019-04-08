@@ -3,4 +3,7 @@ export interface IQueryModel {
   currentPage: number;
   sort?: string;
   sortDirection?: string;
+  searchText?: string;
+  type?: string;
+
 }

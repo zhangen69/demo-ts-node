@@ -13,7 +13,7 @@ import { IQueryModel } from 'src/app/interfaces/query-model';
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
   isAuth = false;
-  products: MatTableDataSource<Product>;
+  dataSource: MatTableDataSource<Product>;
   displayedColumns: string[] = ['name', 'price', 'audit.updatedDate', 'action'];
   totalItems = 0;
   queryModel: IQueryModel = {
@@ -47,9 +47,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   fetchAll() {
     this.service.fetchAll(this.queryModel, this.paginator.pageIndex).subscribe((res: any) => {
-      this.products = new MatTableDataSource<Product>(res.data);
-      this.products.sort = this.sort;
+      this.dataSource = new MatTableDataSource<Product>(res.data);
+      this.dataSource.sort = this.sort;
       this.totalItems = res.totalItems;
+      this.paginator.firstPage();
     });
   }
 
@@ -59,5 +60,18 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   sortData(sort: Sort) {
     this.service.sort(sort, this.fetchAll);
+  }
+
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    this.queryModel.searchText = filterValue.trim().toLowerCase();
+    this.queryModel.type = 'name';
+
+    this.fetchAll();
+
+    // if (this.dataSource.paginator) {
+    //   this.dataSource.paginator.firstPage();
+    // }
   }
 }
