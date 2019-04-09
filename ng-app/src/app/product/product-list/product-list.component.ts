@@ -17,10 +17,13 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['name', 'price', 'audit.updatedDate', 'action'];
   totalItems = 0;
   queryModel: IQueryModel = {
-    pageSize: 5,
+    pageSize: 10,
     currentPage: 0,
   };
-  private authListenerSubs: Subscription;
+  filterList = [
+    { type: 'name', display: 'Name', queryType: 'string' },
+    { type: 'price', display: 'Price', queryType: 'number' },
+  ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -28,9 +31,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   constructor(private service: StandardService, private authService: AuthService) {
     this.service.init('product', this.queryModel);
     this.isAuth = this.authService.getIsAuth();
-    this.authListenerSubs = this.authService.getAuthStatusListener().subscribe(isAuth => {
+    this.authService.getAuthStatusListener().subscribe(isAuth => {
       this.isAuth = isAuth;
     });
+    this.queryModel.selectedFilter = this.filterList[0];
   }
 
   ngOnInit() {
@@ -38,11 +42,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-    merge(this.sort.sortChange, this.paginator.page).subscribe(() => {
-      this.fetchAll();
-    });
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+    merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.fetchAll());
   }
 
   fetchAll() {
@@ -59,19 +60,15 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   sortData(sort: Sort) {
-    this.service.sort(sort, this.fetchAll);
+    this.service.sort(sort);
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  applyFilter(queryModel: IQueryModel) {
+    console.log(queryModel);
 
-    this.queryModel.searchText = filterValue.trim().toLowerCase();
-    this.queryModel.type = 'name';
+    queryModel.type = queryModel.selectedFilter.type;
+    queryModel.queryType = queryModel.selectedFilter.queryType;
 
     this.fetchAll();
-
-    // if (this.dataSource.paginator) {
-    //   this.dataSource.paginator.firstPage();
-    // }
   }
 }

@@ -24,7 +24,7 @@ export default class QueryModel implements IQueryModel {
         this.type = queryModel.type || this.type;
         this.queryType = queryModel.queryType || this.queryType;
         // for sorting
-        this.sort = queryModel.sortBy || this.sort;
+        this.sort = queryModel.sort || this.sort;
         this.sortDirection = queryModel.sortDirection || this.sortDirection;
         // advanced search
         this.filters = queryModel.filters || this.filters;
@@ -33,8 +33,7 @@ export default class QueryModel implements IQueryModel {
     public getQuery() {
         // query patterns: conditions, select columns, pagination options
         const conditions: any = {};
-        const selections = null;
-        const options = { skip: (this.currentPage * this.pageSize), limit: this.pageSize, sort: {} };
+        const options = { skip: (this.currentPage * this.pageSize), limit: this.pageSize, sort: '', sortDirection: 0 };
 
         if (!!this.type && !!this.searchText) {
             this._getCondition(conditions, this);
@@ -50,10 +49,11 @@ export default class QueryModel implements IQueryModel {
         }
 
         if (this.sort) {
-            options.sort[this.sort] = this.sortDirection === 'ASC' ? 0 : -1;
+            options.sort = this.sort;
+            options.sortDirection = this.sortDirection === 'ASC' ? 0 : -1;
         }
 
-        return {conditions, selections, options};
+        return {conditions, options};
     }
 
     private _isEmpty(obj) {

@@ -14,7 +14,8 @@ import {
   MatCardModule,
   MatSnackBarModule,
   MatDialogModule,
-  MatIconModule
+  MatIconModule,
+  MatSelectModule
 } from '@angular/material';
 import { FileUploadModule } from 'ng2-file-upload';
 import { ToastrModule } from 'ngx-toastr';
@@ -81,7 +82,8 @@ import { ResetPasswordComponent } from './auth/reset-password/reset-password.com
     MatCardModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatIconModule
+    MatIconModule,
+    MatSelectModule,
   ],
   entryComponents: [ConfirmationDialogComponent],
   providers: [

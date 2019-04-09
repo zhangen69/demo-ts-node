@@ -121,13 +121,13 @@ class Controller {
     }
 
     async fetchAll(queryModel: QueryModel, auth?) {
-        const { conditions, selections, options } = new QueryModel(queryModel).getQuery();
+        const { conditions, options } = new QueryModel(queryModel).getQuery();
         if (auth.isAuth) {
             // $ne as NOT EQUAL, username not equal to current user
             conditions.username = { $ne: auth.user.username };
         }
         const count = await this.estimatedDocumentCount(conditions);
-        const users = await this.findUsers(conditions, selections, options);
+        const users = await this.findUsers(conditions, options);
         return {
             status: 200,
             data: mapColletionToUserDTO(users),
@@ -181,9 +181,10 @@ class Controller {
         return await this.updateUser(user, set, 'your password was changed successfully!');
     }
 
-    private findUsers(conditions, selections?, options?) {
+    private findUsers(conditions, options?) {
         return new Promise<any>((resolve, reject) => {
-            User.find(conditions, selections, options, (err, docs) => this.resHandler({ resolve, reject }, { err, res: docs }));
+            const sortQuery = (options.sortDirection === 'ASC' ? '' : '-') + options.sort;
+            User.find(conditions).sort(sortQuery).skip(options.skip).limit(options.limit).exec((err, docs) => this.resHandler({ resolve, reject }, { err, res: docs }));
         });
     }
 

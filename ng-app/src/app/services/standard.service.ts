@@ -123,10 +123,8 @@ export class StandardService {
       });
   }
 
-  sort(sort: Sort, callback) {
+  sort(sort: Sort) {
     this.queryModel.sort = sort.active;
     this.queryModel.sortDirection = sort.direction.toUpperCase();
-
-    callback();
   }
 }

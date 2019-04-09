@@ -5,5 +5,6 @@ export interface IQueryModel {
   sortDirection?: string;
   searchText?: string;
   type?: string;
-
+  queryType?: string; // string, number, Date, ...
+  selectedFilter?: any;
 }

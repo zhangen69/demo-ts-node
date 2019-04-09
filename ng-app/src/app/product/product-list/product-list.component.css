@@ -28,6 +28,8 @@ th.mat-sort-header-sorted {
   margin-top: 1rem;
 }
 
-.mat-form-field {
-  width: 100%;
+.standard-filter .mat-form-field {
+  padding: 0 5px;
 }
+
+
