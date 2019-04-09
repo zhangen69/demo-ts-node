@@ -69,6 +69,6 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   sortData(sort: Sort) {
-    this.userService.sort(sort, this.fetchAll);
+    this.userService.sort(sort);
   }
 }
