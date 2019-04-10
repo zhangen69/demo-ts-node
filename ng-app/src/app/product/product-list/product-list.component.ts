@@ -2,7 +2,7 @@ import { AuthService } from './../../services/auth.service';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Product } from '../../models/product.model';
 import { MatTableDataSource, MatSort, MatPaginator, Sort } from '@angular/material';
-import { merge, Subscription } from 'rxjs';
+import { merge, Subject } from 'rxjs';
 import { StandardService } from 'src/app/services/standard.service';
 import { IQueryModel } from 'src/app/interfaces/query-model';
 
@@ -24,6 +24,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     { type: 'name', display: 'Name', queryType: 'string' },
     { type: 'price', display: 'Price', queryType: 'number' },
   ];
+  selectedFilter: any;
+  selectedFilterListerner = new Subject<any>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -31,10 +33,13 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   constructor(private service: StandardService, private authService: AuthService) {
     this.service.init('product', this.queryModel);
     this.isAuth = this.authService.getIsAuth();
-    this.authService.getAuthStatusListener().subscribe(isAuth => {
-      this.isAuth = isAuth;
+    this.authService.getAuthStatusListener().subscribe(isAuth => this.isAuth = isAuth);
+    this.selectedFilterListerner.asObservable().subscribe(filter => {
+      this.queryModel.type = filter.type;
+      this.queryModel.queryType = filter.queryType;
     });
-    this.queryModel.selectedFilter = this.filterList[0];
+    this.selectedFilter = this.filterList[0];
+    this.selectedFilterListerner.next(this.selectedFilter);
   }
 
   ngOnInit() {
@@ -43,16 +48,21 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-    merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.fetchAll());
+    merge(this.sort.sortChange, this.paginator.page).subscribe(() => {
+      this.queryModel.currentPage = this.paginator.pageIndex;
+      this.fetchAll();
+    });
   }
 
   fetchAll() {
-    this.service.fetchAll(this.queryModel, this.paginator.pageIndex).subscribe((res: any) => {
+    return this.service.fetchAll(this.queryModel).subscribe((res: any) => {
       this.dataSource = new MatTableDataSource<Product>(res.data);
-      this.dataSource.sort = this.sort;
       this.totalItems = res.totalItems;
-      this.paginator.firstPage();
     });
+  }
+
+  onChangeFilter(filter) {
+    this.selectedFilterListerner.next(filter);
   }
 
   delete(item) {
@@ -64,11 +74,6 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(queryModel: IQueryModel) {
-    console.log(queryModel);
-
-    queryModel.type = queryModel.selectedFilter.type;
-    queryModel.queryType = queryModel.selectedFilter.queryType;
-
-    this.fetchAll();
+    this.fetchAll().add(() => this.paginator.firstPage());
   }
 }
