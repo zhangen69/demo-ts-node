@@ -75,8 +75,14 @@ export class StandardService {
     return fetchData;
   }
 
-  fetchAll(queryModel = {}, currentPage) {
-    this.queryModel.currentPage = currentPage;
+  fetchAll(queryModel: IQueryModel) {
+    if (!queryModel) {
+      queryModel = {
+        pageSize: 10,
+        currentPage: 0,
+      };
+    }
+
     return this.http.get(
       this.apiUrl + '?queryModel=' + JSON.stringify(queryModel)
     );

@@ -5,7 +5,6 @@ import { User } from 'src/app/models/user.model';
 import { IQueryModel } from 'src/app/interfaces/query-model';
 import { merge } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
-import { StandardService } from 'src/app/services/standard.service';
 
 @Component({
   selector: 'app-user-list',
@@ -28,12 +27,8 @@ export class UserListComponent implements OnInit, AfterViewInit {
   constructor(private userService: UserService, private authService: AuthService) {
     this.userService.init('user', this.queryModel, this.paginator);
     this.isAuth = this.authService.getIsAuth();
-    this.authService.getAuthStatusListener().subscribe(isAuth => {
-      this.isAuth = isAuth;
-    });
-    this.userService.getRefreshListerner().subscribe(() => {
-      this.fetchAll();
-    });
+    this.authService.getAuthStatusListener().subscribe(isAuth => this.isAuth = isAuth);
+    this.userService.getRefreshListerner().subscribe(() => this.fetchAll());
   }
 
   ngOnInit() {
@@ -42,16 +37,15 @@ export class UserListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
     merge(this.sort.sortChange, this.paginator.page).subscribe(() => {
+      this.queryModel.currentPage = this.paginator.pageIndex;
       this.fetchAll();
     });
   }
 
   fetchAll() {
-    this.userService.fetchAll(this.queryModel, this.paginator.pageIndex).subscribe((res: any) => {
+    return this.userService.fetchAll(this.queryModel).subscribe((res: any) => {
       this.dataSource = new MatTableDataSource<User>(res.data);
-      this.dataSource.sort = this.sort;
       this.totalItems = res.totalItems;
     });
   }

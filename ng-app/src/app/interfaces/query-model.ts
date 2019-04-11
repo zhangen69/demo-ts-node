@@ -7,4 +7,6 @@ export interface IQueryModel {
   type?: string;
   queryType?: string; // string, number, Date, ...
   selectedFilter?: any;
+  min?: number;
+  max?: number;
 }
