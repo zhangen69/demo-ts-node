@@ -63,6 +63,10 @@
   - [x] Upload Images
   - [x] Updated Audit for each Record (created by, created date, updated by, updated date)
   - [ ] Search & Filter Records
+    - [x] Search Text
+    - [ ] Search Number (min, max)
+    - [ ] Search Date (from, to)
+    - [ ] Select Types of Column to Searching
 - [ ] Send Email
 - [ ] Generate Report
 - [ ] Configuration Settings (Email Settings, Access Failed Settings, ...)
