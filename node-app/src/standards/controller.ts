@@ -20,6 +20,11 @@ export default class StandardController {
         if (auth.isAuth) {
             model.audit = { updatedBy: auth.user._id, createdBy: auth.user._id };
         }
+        // const Product = require('../models/product.model');
+        // const newProduct = new Product();
+        // newProduct.save().then((data) => {
+
+        // });
         const newModel = new this.model(model);
         return new Promise((resolve, reject) => {
             newModel.save().then((data) => {
